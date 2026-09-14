@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE SWARM BELOW</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div id="gameWrapper">
+
+    <canvas id="gameCanvas" width="1200" height="720"></canvas>
+
+    <!-- TITLE SCREEN -->
+    <section id="titleScreen" class="screen">
+        <div class="titleAtmosphere"></div>
+
+        <div class="titleContent">
+            <div class="titleSmall">KISPAT DREAMS INTERACTIVE</div>
+
+            <h1>THE SWARM<br><span>BELOW</span></h1>
+
+            <div class="titleLine"></div>
+
+            <p id="titleSubtitle">
+                SOMETHING IS WATCHING FROM BELOW
+            </p>
+
+            <button id="startButton" class="menuButton">
+                ENTER
+            </button>
+
+            <div class="languageArea">
+                <div class="languageLabel">LANGUAGE</div>
+
+                <div class="languageButtons">
+                    <button class="languageButton active" data-language="en">
+                        ENGLISH
+                    </button>
+
+                    <button class="languageButton" data-language="es">
+                        ESPAÑOL
+                    </button>
+                </div>
+            </div>
+
+            <div class="titleFooter">
+                ALPHA 0.3
+            </div>
+        </div>
+    </section>
+
+    <!-- TUTORIAL -->
+    <section id="tutorialScreen" class="screen hidden">
+
+        <div class="tutorialPanel">
+
+            <div class="tutorialHeader">
+                <span id="tutorialStepLabel">INTRODUCTION</span>
+                <span id="tutorialStepCounter">1 / 5</span>
+            </div>
+
+            <div class="tutorialBody">
+
+                <div class="tutorialVisual" id="tutorialVisual">
+                    THE WITNESS
+                </div>
+
+                <div class="tutorialText">
+
+                    <h2 id="tutorialTitle">THE WITNESS</h2>
+
+                    <p id="tutorialDescription">
+                        You are THE WITNESS.
+                        Something beneath the world has begun to move.
+                        Stay alive and observe the convergence.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="tutorialControls">
+                <button id="tutorialBack" class="smallButton">
+                    BACK
+                </button>
+
+                <button id="tutorialNext" class="menuButton">
+                    NEXT
+                </button>
+
+                <button id="tutorialSkip" class="smallButton">
+                    SKIP
+                </button>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- HUD -->
+    <section id="hud">
+
+        <div id="topHUD">
+
+            <div class="resourceBlock integrityBlock">
+                <div class="resourceLabel">INTEGRITY</div>
+
+                <div class="bar">
+                    <div id="integrityFill"></div>
+                </div>
+
+                <div id="integrityText">100 / 100</div>
+            </div>
+
+            <div class="resourceBlock energyBlock">
+                <div class="resourceLabel">ENERGY</div>
+
+                <div class="bar">
+                    <div id="energyFill"></div>
+                </div>
+
+                <div id="energyText">100 / 100</div>
+            </div>
+
+            <div class="counter">
+                <span>ECHO</span>
+                <strong id="echoText">0</strong>
+            </div>
+
+            <div class="counter">
+                <span>MEMORY</span>
+                <strong id="memoryText">0</strong>
+            </div>
+
+            <div class="counter waveCounter">
+                <span>WAVE</span>
+                <strong id="waveText">1</strong>
+
+                <div class="waveBar">
+                    <div id="waveFill"></div>
+                </div>
+            </div>
+
+            <div class="counter">
+                <span>COMBO</span>
+                <strong id="comboText">x1</strong>
+            </div>
+            <div class="counter">
+                <span>KILLS</span>
+                <strong id="killsText">0</strong>
+            </div>
+            <button id="pauseButton" class="pauseButton">
+                PAUSE
+            </button>
+
+        </div>
+
+        <div id="eventMessage"></div>
+
+        <div id="pickupMessage"></div>
+
+        <div id="bossHUD" class="hidden">
+            <div class="bossTitle">ABERRATION</div>
+
+            <div class="bossBar">
+                <div id="bossFill"></div>
+            </div>
+        </div>
+
+        <div id="bottomHUD">
+
+            <div class="abilityCard">
+                <div class="abilityKey">Q</div>
+                <div class="abilityName">EYE</div>
+                <div class="cooldown" id="cooldownQ"></div>
+            </div>
+
+            <div class="abilityCard">
+                <div class="abilityKey">W</div>
+                <div class="abilityName">THORN</div>
+                <div class="cooldown" id="cooldownW"></div>
+            </div>
+
+            <div class="abilityCard">
+                <div class="abilityKey">E</div>
+                <div class="abilityName">GRAVITY WOMB</div>
+                <div class="cooldown" id="cooldownE"></div>
+            </div>
+
+            <div class="abilityCard">
+                <div class="abilityKey">R</div>
+                <div class="abilityName">CHORUS</div>
+                <div class="cooldown" id="cooldownR"></div>
+            </div>
+
+            <div class="abilityCard">
+                <div class="abilityKey">F</div>
+                <div class="abilityName">THE MOUTH</div>
+                <div class="cooldown" id="cooldownF"></div>
+            </div>
+
+            <div class="abilityCard">
+                <div class="abilityKey">SPACE</div>
+                <div class="abilityName">DASH</div>
+                <div class="cooldown" id="cooldownDash"></div>
+            </div>
+
+        </div>
+
+        <div id="controlsText">
+            WASD MOVE &nbsp; | &nbsp; MOUSE AIM &nbsp; | &nbsp; CLICK / Q FIRE
+        </div>
+
+    </section>
+
+    <!-- PAUSE -->
+    <section id="pauseScreen" class="overlay hidden">
+
+        <div class="overlayPanel">
+
+            <div class="overlayHeader">PAUSED</div>
+
+            <div class="overlaySubtitle">
+                THE SWARM IS WAITING
+            </div>
+
+            <button id="resumeButton" class="menuButton">
+                RESUME
+            </button>
+
+            <button id="pauseRestartButton" class="smallButton">
+                RESTART
+            </button>
+
+            <div class="pauseHint">
+                ESC TO RESUME
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- MEMORY FRACTURE -->
+    <section id="upgradeScreen" class="overlay hidden">
+
+        <div class="upgradePanel">
+
+            <div class="overlayHeader">
+                MEMORY FRACTURE
+            </div>
+
+            <div class="overlaySubtitle" id="upgradeSubtitle">
+                CHOOSE A MEMORY TO CARRY FORWARD
+            </div>
+
+            <div id="upgradeGrid" class="upgradeGrid"></div>
+
+        </div>
+
+    </section>
+
+    <!-- GAME OVER -->
+    <section id="gameOverScreen" class="overlay hidden">
+
+        <div class="overlayPanel">
+
+            <div class="overlayHeader">THE WITNESS FADES</div>
+
+            <div class="overlaySubtitle">
+                THE SWARM REMEMBERS
+            </div>
+
+            <div class="stats">
+
+                <div>
+                    <span>WAVE</span>
+                    <strong id="finalWave">1</strong>
+                </div>
+
+                <div>
+                    <span>KILLS</span>
+                    <strong id="finalKills">0</strong>
+                </div>
+
+                <div>
+                    <span>ECHO</span>
+                    <strong id="finalEcho">0</strong>
+                </div>
+
+                <div>
+                    <span>MEMORY</span>
+                    <strong id="finalMemory">0</strong>
+                </div>
+
+                <div>
+                    <span>MAX COMBO</span>
+                    <strong id="finalCombo">x1</strong>
+                </div>
+
+                <div>
+                    <span>LARGEST CONVERGENCE</span>
+                    <strong id="finalConvergence">0</strong>
+                </div>
+
+            </div>
+
+            <button id="retryButton" class="menuButton">
+                TRY AGAIN
+            </button>
+
+        </div>
+
+    </section>
+
+</div>
+
+<script src="game.js"></script>
+
+</body>
+</html>
