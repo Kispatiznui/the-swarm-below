@@ -1,0 +1,648 @@
+/* =========================================================
+   THE SWARM BELOW
+   DOCUMENTATION / LANDING PAGE
+========================================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: #080909;
+    color: #d7d7d2;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 40%,
+            rgba(0, 77, 64, 0.22),
+            transparent 35%
+        ),
+        linear-gradient(
+            135deg,
+            #050606,
+            #0b1010 50%,
+            #080909
+        );
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background:
+        radial-gradient(
+            circle at 20% 80%,
+            rgba(139, 0, 0, 0.16),
+            transparent 30%
+        );
+
+    pointer-events: none;
+}
+
+.heroOverlay {
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0, 0, 0, 0.9),
+            rgba(0, 0, 0, 0.35),
+            rgba(0, 0, 0, 0.9)
+        );
+}
+
+.heroContent {
+    position: relative;
+    z-index: 2;
+
+    width: min(1100px, 90%);
+    margin: auto;
+}
+
+.eyebrow,
+.sectionLabel {
+    color: #6fa89e;
+    font-size: 0.75rem;
+    letter-spacing: 0.35rem;
+    font-weight: bold;
+}
+
+.hero h1 {
+    margin-top: 25px;
+
+    font-size: clamp(4rem, 10vw, 9rem);
+    line-height: 0.82;
+    letter-spacing: -0.05em;
+
+    color: #eeeeea;
+}
+
+.hero h1 span {
+    color: #8b0000;
+}
+
+.version {
+    margin-top: 30px;
+
+    color: #999999;
+    letter-spacing: 0.4rem;
+    font-size: 0.9rem;
+}
+
+.heroDescription {
+    max-width: 600px;
+    margin-top: 30px;
+
+    color: #a8aaa7;
+    font-size: 1.1rem;
+}
+
+.heroButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+
+    margin-top: 40px;
+}
+
+.button {
+    display: inline-block;
+
+    padding: 14px 28px;
+
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: bold;
+    letter-spacing: 0.16rem;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.button:hover {
+    transform: translateY(-3px);
+}
+
+.button.primary {
+    background: #8b0000;
+    color: #ffffff;
+}
+
+.button.primary:hover {
+    background: #a00000;
+}
+
+.button.secondary {
+    border: 1px solid #39403f;
+    color: #c7ccc9;
+}
+
+.button.secondary:hover {
+    border-color: #6fa89e;
+}
+
+
+/* =========================================================
+   GENERAL SECTIONS
+========================================================= */
+
+.section {
+    width: min(1100px, 90%);
+    margin: auto;
+
+    padding: 120px 0;
+}
+
+.sectionHeader {
+    margin-bottom: 60px;
+}
+
+.sectionHeader h2 {
+    margin-top: 12px;
+
+    color: #eeeeea;
+
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+}
+
+.sectionLabel {
+    color: #8b0000;
+}
+
+
+/* =========================================================
+   ABOUT
+========================================================= */
+
+.about {
+    border-top: 1px solid #171b1a;
+}
+
+.aboutContent {
+    max-width: 800px;
+}
+
+.aboutContent p {
+    margin-bottom: 25px;
+
+    color: #a9adaa;
+    font-size: 1.15rem;
+}
+
+.aboutContent p:last-child {
+    color: #d7d7d2;
+    font-size: 1.4rem;
+}
+
+
+/* =========================================================
+   HOW TO PLAY
+========================================================= */
+
+.gameplay {
+    max-width: none;
+    width: 100%;
+
+    padding-left: 5%;
+    padding-right: 5%;
+
+    background: #0b0e0d;
+}
+
+.steps {
+    display: grid;
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 2px;
+}
+
+.step {
+    min-height: 260px;
+
+    padding: 35px;
+
+    background: #101413;
+
+    border: 1px solid #1a211f;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.step:hover {
+    transform: translateY(-5px);
+    border-color: #315d55;
+}
+
+.stepNumber {
+    color: #8b0000;
+
+    font-size: 0.8rem;
+    letter-spacing: 0.2rem;
+}
+
+.step h3 {
+    margin-top: 35px;
+
+    color: #eeeeea;
+
+    letter-spacing: 0.15rem;
+}
+
+.step p {
+    margin-top: 15px;
+
+    color: #858b88;
+}
+
+
+/* =========================================================
+   CONTROLS
+========================================================= */
+
+.controlGrid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 12px;
+}
+
+.control {
+    padding: 25px;
+
+    background: #0e1110;
+
+    border: 1px solid #202725;
+
+    text-align: center;
+}
+
+.control strong {
+    display: block;
+
+    color: #eeeeea;
+
+    font-size: 1.4rem;
+    letter-spacing: 0.1rem;
+}
+
+.control span {
+    display: block;
+
+    margin-top: 8px;
+
+    color: #68716d;
+
+    font-size: 0.7rem;
+    letter-spacing: 0.18rem;
+}
+
+
+/* =========================================================
+   SYSTEMS
+========================================================= */
+
+.systems {
+    max-width: none;
+    width: 100%;
+
+    padding-left: 5%;
+    padding-right: 5%;
+
+    background: #080b0a;
+}
+
+.systemGrid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 15px;
+}
+
+.systemCard {
+    padding: 35px;
+
+    min-height: 190px;
+
+    background: #0e1211;
+
+    border-left: 2px solid #315d55;
+}
+
+.systemCard h3 {
+    color: #d7d7d2;
+
+    letter-spacing: 0.12rem;
+}
+
+.systemCard p {
+    margin-top: 15px;
+
+    color: #777f7b;
+}
+
+
+/* =========================================================
+   ABILITIES
+========================================================= */
+
+.abilityGrid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, 1fr);
+
+    gap: 12px;
+}
+
+.ability {
+    padding: 30px;
+
+    min-height: 260px;
+
+    background: #0d100f;
+
+    border: 1px solid #202725;
+}
+
+.abilityKey {
+    display: inline-flex;
+
+    width: 42px;
+    height: 42px;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #8b0000;
+
+    color: #eeeeea;
+
+    font-weight: bold;
+}
+
+.ability h3 {
+    margin-top: 30px;
+
+    color: #eeeeea;
+
+    font-size: 1rem;
+    letter-spacing: 0.08rem;
+}
+
+.ability p {
+    margin-top: 15px;
+
+    color: #727a76;
+
+    font-size: 0.9rem;
+}
+
+
+/* =========================================================
+   UPGRADES
+========================================================= */
+
+.upgrades {
+    max-width: none;
+    width: 100%;
+
+    padding-left: 5%;
+    padding-right: 5%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0b0d0c,
+            #110909
+        );
+}
+
+.upgradeContent {
+    max-width: 750px;
+}
+
+.upgradeContent p {
+    margin-bottom: 22px;
+
+    color: #969c99;
+
+    font-size: 1.1rem;
+}
+
+.upgradeContent .warning {
+    color: #8b0000;
+
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   SCREENSHOTS
+========================================================= */
+
+.screenshotGrid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 15px;
+}
+
+.screenshotPlaceholder {
+    aspect-ratio: 16 / 9;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #111615,
+            #090b0a
+        );
+
+    border: 1px solid #242b29;
+
+    color: #414946;
+
+    letter-spacing: 0.2rem;
+}
+
+
+/* =========================================================
+   ROADMAP
+========================================================= */
+
+.roadmap {
+    border-top: 1px solid #171b1a;
+}
+
+.roadmapList {
+    max-width: 850px;
+}
+
+.roadmapItem {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 25px 0;
+
+    border-bottom: 1px solid #1b211f;
+
+    color: #686f6c;
+}
+
+.roadmapItem span {
+    letter-spacing: 0.12rem;
+}
+
+.roadmapItem strong {
+    font-size: 0.7rem;
+    letter-spacing: 0.15rem;
+}
+
+.roadmapItem.complete {
+    color: #eeeeea;
+}
+
+.roadmapItem.complete strong {
+    color: #6fa89e;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer {
+    padding: 60px 20px;
+
+    border-top: 1px solid #171b1a;
+
+    text-align: center;
+
+    background: #050606;
+}
+
+footer p {
+    color: #eeeeea;
+
+    letter-spacing: 0.25rem;
+    font-weight: bold;
+}
+
+footer span {
+    display: block;
+
+    margin-top: 10px;
+
+    color: #4f5753;
+
+    font-size: 0.7rem;
+    letter-spacing: 0.15rem;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .steps,
+    .systemGrid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .abilityGrid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .controlGrid {
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+    .screenshotGrid {
+        grid-template-columns:
+            1fr;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .section {
+        padding: 80px 0;
+    }
+
+    .heroContent {
+        width: 88%;
+    }
+
+    .steps,
+    .systemGrid,
+    .abilityGrid,
+    .controlGrid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .hero h1 {
+        font-size: 4rem;
+    }
+
+    .heroButtons {
+        flex-direction: column;
+    }
+
+    .button {
+        text-align: center;
+    }
+
+    .roadmapItem {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+}
