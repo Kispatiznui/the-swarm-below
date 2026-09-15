@@ -103,6 +103,53 @@ const TEXT = {
         maxCombo: "MAX COMBO",
         largestConvergence: "LARGEST CONVERGENCE",
 
+        resourceIntegrity: "INTEGRITY",
+        resourceEnergy: "ENERGY",
+        comboLabel: "COMBO",
+        controlsHint:
+            "WASD MOVE | MOUSE AIM | CLICK FIRE | Q CALL",
+
+        waveEvent: "WAVE {n}",
+        aberrationDescends: "ABERRATION DESCENDS",
+        aberrationDestroyed: "ABERRATION DESTROYED",
+        aberrationReward: "+2500 ECHO  +5 MEMORY",
+        gravityWombEvent: "GRAVITY WOMB",
+        chorusEvent: "CHORUS",
+        mouthEvent: "THE MOUTH +{n}",
+        theCallEvent: "THE CALL",
+        gatherEcho: "GATHER ECHO FOR AN UPGRADE",
+
+        echoPickup: "+{n} ECHO",
+        energyPickup: "+{n} ENERGY",
+        healPickup: "+{n} INTEGRITY",
+        memoryPickup: "+{n} MEMORY",
+
+        upgradeSharpEyeName: "SHARPENED EYE",
+        upgradeSharpEyeDesc: "+8 EYE damage.",
+        upgradeDeepReservoirName: "DEEP RESERVOIR",
+        upgradeDeepReservoirDesc: "+20 maximum ENERGY.",
+        upgradeHardenedFormName: "HARDENED FORM",
+        upgradeHardenedFormDesc:
+            "+15 maximum INTEGRITY and heal 15.",
+        upgradeThornGrowthName: "THORN GROWTH",
+        upgradeThornGrowthDesc:
+            "+12 THORN damage and +20 range.",
+        upgradeGravityRemembersName: "GRAVITY REMEMBERS",
+        upgradeGravityRemembersDesc:
+            "+1000ms GRAVITY WOMB duration.",
+        upgradePiercingEyeName: "PIERCING EYE",
+        upgradePiercingEyeDesc: "+1 projectile pierce.",
+        upgradeLongChorusName: "LONG CHORUS",
+        upgradeLongChorusDesc: "+25 CHORUS damage.",
+        upgradeLivingNerveName: "LIVING NERVE",
+        upgradeLivingNerveDesc:
+            "+0.006 ENERGY regeneration.",
+        upgradeEchoHungerName: "ECHO HUNGER",
+        upgradeEchoHungerDesc: "+25% ECHO from drops.",
+        upgradeMemoryHarvestName: "MEMORY HARVEST",
+        upgradeMemoryHarvestDesc:
+            "+20% MEMORY drop chance.",
+
         languageName: "ENGLISH"
     },
 
@@ -165,14 +212,78 @@ const TEXT = {
         maxCombo: "COMBO MÁXIMO",
         largestConvergence: "MAYOR CONVERGENCIA",
 
+        resourceIntegrity: "INTEGRIDAD",
+        resourceEnergy: "ENERGÍA",
+        comboLabel: "COMBO",
+        controlsHint:
+            "WASD MOVER | MOUSE APUNTAR | CLICK DISPARAR | Q LLAMAR",
+
+        waveEvent: "OLA {n}",
+        aberrationDescends: "LA ABERRACIÓN DESCIENDE",
+        aberrationDestroyed: "ABERRACIÓN DESTRUIDA",
+        aberrationReward: "+2500 ECHO  +5 MEMORIA",
+        gravityWombEvent: "GRAVITY WOMB",
+        chorusEvent: "CHORUS",
+        mouthEvent: "THE MOUTH +{n}",
+        theCallEvent: "THE CALL",
+        gatherEcho: "REÚNE ECHO PARA UNA MEJORA",
+
+        echoPickup: "+{n} ECHO",
+        energyPickup: "+{n} ENERGÍA",
+        healPickup: "+{n} INTEGRIDAD",
+        memoryPickup: "+{n} MEMORIA",
+
+        upgradeSharpEyeName: "OJO AFILADO",
+        upgradeSharpEyeDesc: "+8 de daño de EYE.",
+        upgradeDeepReservoirName: "RESERVA PROFUNDA",
+        upgradeDeepReservoirDesc: "+20 de ENERGÍA máxima.",
+        upgradeHardenedFormName: "FORMA ENDURECIDA",
+        upgradeHardenedFormDesc:
+            "+15 de INTEGRIDAD máxima y cura 15.",
+        upgradeThornGrowthName: "CRECIMIENTO DE THORN",
+        upgradeThornGrowthDesc:
+            "+12 de daño de THORN y +20 de alcance.",
+        upgradeGravityRemembersName: "LA GRAVEDAD RECUERDA",
+        upgradeGravityRemembersDesc:
+            "+1000ms de duración de GRAVITY WOMB.",
+        upgradePiercingEyeName: "OJO PERFORANTE",
+        upgradePiercingEyeDesc:
+            "+1 de perforación de proyectil.",
+        upgradeLongChorusName: "CHORUS PROLONGADO",
+        upgradeLongChorusDesc: "+25 de daño de CHORUS.",
+        upgradeLivingNerveName: "NERVIO VIVO",
+        upgradeLivingNerveDesc:
+            "+0.006 de regeneración de ENERGÍA.",
+        upgradeEchoHungerName: "HAMBRE DE ECHO",
+        upgradeEchoHungerDesc:
+            "+25% de ECHO de los objetos soltados.",
+        upgradeMemoryHarvestName: "COSECHA DE MEMORIA",
+        upgradeMemoryHarvestDesc:
+            "+20% de probabilidad de soltar MEMORIA.",
+
         languageName: "ESPAÑOL"
     }
 };
 
 let currentLanguage = "en";
 
-function t(key) {
-    return TEXT[currentLanguage][key] || key;
+function t(key, params) {
+
+    let text =
+        TEXT[currentLanguage][key] || key;
+
+    if (params) {
+
+        for (const paramKey in params) {
+
+            text = text.replace(
+                `{${paramKey}}`,
+                params[paramKey]
+            );
+        }
+    }
+
+    return text;
 }
 
 /* =========================================================
@@ -265,6 +376,9 @@ const echoText =
 
 const memoryText =
     document.getElementById("memoryText");
+
+const killsText =
+    document.getElementById("killsText");
 
 const waveText =
     document.getElementById("waveText");
@@ -415,8 +529,65 @@ function updateInterfaceLanguage() {
     retryButton.textContent =
         t("tryAgain");
 
-    document.querySelector(".overlaySubtitle").textContent =
+    document.getElementById("pauseSubtitle").textContent =
         t("swarmWaiting");
+
+    document.getElementById("pauseHint").textContent =
+        t("escResume");
+
+    document.getElementById("upgradeHeader").textContent =
+        t("memoryFracture");
+
+    document.getElementById("upgradeSubtitle").textContent =
+        t("chooseMemory");
+
+    document.getElementById("gameOverHeader").textContent =
+        t("gameOver");
+
+    document.getElementById("gameOverSubtitle").textContent =
+        t("gameOverSubtitle");
+
+    document.getElementById("integrityLabel").textContent =
+        t("resourceIntegrity");
+
+    document.getElementById("energyLabel").textContent =
+        t("resourceEnergy");
+
+    document.getElementById("echoLabel").textContent =
+        t("echo");
+
+    document.getElementById("memoryLabel").textContent =
+        t("memory");
+
+    document.getElementById("waveLabel").textContent =
+        t("wave");
+
+    document.getElementById("comboLabel").textContent =
+        t("comboLabel");
+
+    document.getElementById("killsLabel").textContent =
+        t("kills");
+
+    document.getElementById("controlsText").textContent =
+        t("controlsHint");
+
+    document.getElementById("statWaveLabel").textContent =
+        t("wave");
+
+    document.getElementById("statKillsLabel").textContent =
+        t("kills");
+
+    document.getElementById("statEchoLabel").textContent =
+        t("echo");
+
+    document.getElementById("statMemoryLabel").textContent =
+        t("memory");
+
+    document.getElementById("statComboLabel").textContent =
+        t("maxCombo");
+
+    document.getElementById("statConvergenceLabel").textContent =
+        t("largestConvergence");
 
     updateTutorial();
 }
@@ -742,7 +913,7 @@ class Drop {
             game.echo += amount;
 
             game.showPickup(
-                `+${amount} ECHO`
+                t("echoPickup", { n: amount })
             );
 
             game.particles.burst(
@@ -764,7 +935,7 @@ class Drop {
                 );
 
             game.showPickup(
-                `+${this.value} ENERGY`
+                t("energyPickup", { n: this.value })
             );
         }
 
@@ -778,7 +949,7 @@ class Drop {
                 );
 
             game.showPickup(
-                `+${this.value} INTEGRITY`
+                t("healPickup", { n: this.value })
             );
         }
 
@@ -787,7 +958,7 @@ class Drop {
             game.memory += this.value;
 
             game.showPickup(
-                `+${this.value} MEMORY`
+                t("memoryPickup", { n: this.value })
             );
 
             game.particles.burst(
@@ -1631,6 +1802,8 @@ class Fragment {
 
         this.dead = false;
 
+        this.alertUntil = 0;
+
         this.spawnTimer =
             random(3000, 6000);
 
@@ -1659,6 +1832,14 @@ class Fragment {
 
         else if (this.clusterType === "MASS") {
             speed *= 0.55;
+        }
+
+        if (
+            performance.now() <
+            this.alertUntil
+        ) {
+
+            speed *= 1.6;
         }
 
         let targetX =
@@ -2370,11 +2551,11 @@ class AberrationBoss {
             this.game.aberrationsKilled++;
 
             this.game.showEvent(
-                "ABERRATION DESTROYED"
+                t("aberrationDestroyed")
             );
 
             this.game.showPickup(
-                "+2500 ECHO  +5 MEMORY"
+                t("aberrationReward")
             );
 
             this.game.particles.burst(
@@ -2781,16 +2962,18 @@ class DefenseSystem {
         this.game = game;
 
         this.cooldowns = {
-        q: 160,
-        w: 2500,
+        eye: 160,
+        q: 10000,
+        c: 2500,
         e: 7000,
         r: 12000,
         f: 15000
         };      
 
         this.lastUsed = {
+            eye: -Infinity,
             q: -Infinity,
-            w: -Infinity,
+            c: -Infinity,
             e: -Infinity,
             r: -Infinity,
             f: -Infinity
@@ -2799,8 +2982,12 @@ class DefenseSystem {
         this.eyeDamage = 20;
         this.eyePierce = 0;
 
-        this.thornDamage = 28;
+        this.thornDamage = 5;
+        this.thornPush = 90;
         this.thornRange = 95;
+
+        this.callCost = 15;
+        this.callAlertDuration = 4000;
 
         this.gravityDuration = 3000;
         this.gravityRadius = 270;
@@ -2836,22 +3023,31 @@ class DefenseSystem {
         const input =
             game.input;
 
-        if (
-            input.mouse.down ||
-            input.isDown("q")
+                if (
+            input.mouse.down
         ) {
 
-            if (this.ready("q")) {
+            if (this.ready("eye")) {
 
                 this.fireEye(game);
             }
         }
 
         if (
-            input.isDown("w")
+            input.isDown("q")
         ) {
 
-            if (this.ready("w")) {
+            if (this.ready("q")) {
+
+                this.theCall(game);
+            }
+        }
+
+        if (
+            input.isDown("c")
+        ) {
+
+            if (this.ready("c")) {
 
                 this.thorn(game);
             }
@@ -2888,9 +3084,9 @@ class DefenseSystem {
         }
     }
 
-    fireEye(game) {
+        fireEye(game) {
 
-        this.use("q");
+        this.use("eye");
 
         const angle =
             angleTo(
@@ -2911,13 +3107,13 @@ class DefenseSystem {
         );
     }
 
-    thorn(game) {
+        thorn(game) {
 
         if (game.witness.energy < 12) {
             return;
         }
 
-        this.use("w");
+        this.use("c");
 
         game.witness.energy -= 12;
 
@@ -2953,10 +3149,10 @@ class DefenseSystem {
                 );
 
                 fragment.x +=
-                    dir.x * 35;
+                    dir.x * this.thornPush;
 
                 fragment.y +=
-                    dir.y * 35;
+                    dir.y * this.thornPush;
             }
         }
 
@@ -3005,7 +3201,7 @@ class DefenseSystem {
         });
 
         game.showEvent(
-            "GRAVITY WOMB"
+            t("gravityWombEvent")
         );
     }
 
@@ -3069,7 +3265,7 @@ class DefenseSystem {
         );
 
         game.showEvent(
-            "CHORUS"
+            t("chorusEvent")
         );
     }
 
@@ -3124,11 +3320,62 @@ class DefenseSystem {
                 );
 
             game.showEvent(
-                `THE MOUTH +${consumed}`
+                t("mouthEvent", { n: consumed })
             );
         }
     }
+    theCall(game) {
 
+        if (
+            game.witness.energy <
+            this.callCost
+        ) {
+            return;
+        }
+
+        this.use("q");
+
+        game.witness.energy -=
+            this.callCost;
+
+        /* COLLECT ALL DROPS ON THE MAP */
+
+        for (const drop of game.drops) {
+
+            if (drop.collected) {
+                continue;
+            }
+
+            drop.collect(game);
+        }
+
+        /* ALERT THE SWARM */
+
+        const alertUntil =
+            performance.now() +
+            this.callAlertDuration;
+
+        for (const fragment of game.fragments) {
+
+            if (fragment.dead) {
+                continue;
+            }
+
+            fragment.alertUntil =
+                alertUntil;
+        }
+
+        game.particles.ring(
+            game.witness.x,
+            game.witness.y,
+            320,
+            "memory"
+        );
+
+        game.showEvent(
+            t("theCallEvent")
+        );
+    }
     getCooldownPercent(name) {
 
         const elapsed =
@@ -3154,13 +3401,12 @@ class UpgradeSystem {
 
         this.game = game;
 
-        this.upgrades = [
+                this.upgrades = [
 
             {
                 id: "sharpEye",
-                name: "SHARPENED EYE",
-                description:
-                    "+8 EYE damage.",
+                nameKey: "upgradeSharpEyeName",
+                descKey: "upgradeSharpEyeDesc",
                 cost: 20,
 
                 apply: game => {
@@ -3170,9 +3416,8 @@ class UpgradeSystem {
 
             {
                 id: "deepReservoir",
-                name: "DEEP RESERVOIR",
-                description:
-                    "+20 maximum ENERGY.",
+                nameKey: "upgradeDeepReservoirName",
+                descKey: "upgradeDeepReservoirDesc",
                 cost: 25,
 
                 apply: game => {
@@ -3183,9 +3428,8 @@ class UpgradeSystem {
 
             {
                 id: "hardenedForm",
-                name: "HARDENED FORM",
-                description:
-                    "+15 maximum INTEGRITY and heal 15.",
+                nameKey: "upgradeHardenedFormName",
+                descKey: "upgradeHardenedFormDesc",
                 cost: 30,
 
                 apply: game => {
@@ -3196,9 +3440,8 @@ class UpgradeSystem {
 
             {
                 id: "thornGrowth",
-                name: "THORN GROWTH",
-                description:
-                    "+12 THORN damage and +20 range.",
+                nameKey: "upgradeThornGrowthName",
+                descKey: "upgradeThornGrowthDesc",
                 cost: 40,
 
                 apply: game => {
@@ -3209,9 +3452,8 @@ class UpgradeSystem {
 
             {
                 id: "gravityRemembers",
-                name: "GRAVITY REMEMBERS",
-                description:
-                    "+1000ms GRAVITY WOMB duration.",
+                nameKey: "upgradeGravityRemembersName",
+                descKey: "upgradeGravityRemembersDesc",
                 cost: 50,
 
                 apply: game => {
@@ -3221,9 +3463,8 @@ class UpgradeSystem {
 
             {
                 id: "piercingEye",
-                name: "PIERCING EYE",
-                description:
-                    "+1 projectile pierce.",
+                nameKey: "upgradePiercingEyeName",
+                descKey: "upgradePiercingEyeDesc",
                 cost: 60,
 
                 apply: game => {
@@ -3233,9 +3474,8 @@ class UpgradeSystem {
 
             {
                 id: "longChorus",
-                name: "LONG CHORUS",
-                description:
-                    "+25 CHORUS damage.",
+                nameKey: "upgradeLongChorusName",
+                descKey: "upgradeLongChorusDesc",
                 cost: 70,
 
                 apply: game => {
@@ -3245,9 +3485,8 @@ class UpgradeSystem {
 
             {
                 id: "livingNerve",
-                name: "LIVING NERVE",
-                description:
-                    "+0.006 ENERGY regeneration.",
+                nameKey: "upgradeLivingNerveName",
+                descKey: "upgradeLivingNerveDesc",
                 cost: 80,
 
                 apply: game => {
@@ -3257,9 +3496,8 @@ class UpgradeSystem {
 
             {
                 id: "echoHunger",
-                name: "ECHO HUNGER",
-                description:
-                    "+25% ECHO from drops.",
+                nameKey: "upgradeEchoHungerName",
+                descKey: "upgradeEchoHungerDesc",
                 cost: 90,
 
                 apply: game => {
@@ -3269,9 +3507,8 @@ class UpgradeSystem {
 
             {
                 id: "memoryHarvest",
-                name: "MEMORY HARVEST",
-                description:
-                    "+20% MEMORY drop chance.",
+                nameKey: "upgradeMemoryHarvestName",
+                descKey: "upgradeMemoryHarvestDesc",
                 cost: 100,
 
                 apply: game => {
@@ -3356,11 +3593,11 @@ class UpgradeSystem {
 
         card.innerHTML = `
             <div class="upgradeName">
-                ${upgrade.name}
+                ${t(upgrade.nameKey)}
             </div>
 
             <div class="upgradeDescription">
-                ${upgrade.description}
+                ${t(upgrade.descKey)}
             </div>
 
             <div class="upgradeCost ${
@@ -3414,7 +3651,7 @@ class UpgradeSystem {
                         "PLAYING";
 
                     this.game.showEvent(
-                        upgrade.name
+                        t(upgrade.nameKey)
                     );
                 }
             );
@@ -3781,7 +4018,7 @@ class Game {
         );
 
         this.showEvent(
-            "WAVE 1"
+            t("waveEvent", { n: 1 })
         );
 
         this.updateHUD();
@@ -4024,7 +4261,7 @@ class Game {
         } else {
 
             this.showEvent(
-                "GATHER ECHO FOR AN UPGRADE"
+                t("gatherEcho")
             );
         }
     }
@@ -4076,7 +4313,7 @@ class Game {
                 this.waveDuration;
 
             this.showEvent(
-                `WAVE ${this.wave}`
+                t("waveEvent", { n: this.wave })
             );
 
             if (
@@ -4090,7 +4327,7 @@ class Game {
                     );
 
                 this.showEvent(
-                    "ABERRATION DESCENDS"
+                    t("aberrationDescends")
                 );
             }
         }
