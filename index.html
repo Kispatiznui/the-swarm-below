@@ -106,7 +106,7 @@
         <div id="topHUD">
 
             <div class="resourceBlock integrityBlock">
-                <div class="resourceLabel">INTEGRITY</div>
+                <div class="resourceLabel" id="integrityLabel">INTEGRITY</div>
 
                 <div class="bar">
                     <div id="integrityFill"></div>
@@ -116,7 +116,7 @@
             </div>
 
             <div class="resourceBlock energyBlock">
-                <div class="resourceLabel">ENERGY</div>
+                <div class="resourceLabel" id="energyLabel">ENERGY</div>
 
                 <div class="bar">
                     <div id="energyFill"></div>
@@ -126,17 +126,17 @@
             </div>
 
             <div class="counter">
-                <span>ECHO</span>
+                <span id="echoLabel">ECHO</span>
                 <strong id="echoText">0</strong>
             </div>
 
             <div class="counter">
-                <span>MEMORY</span>
+                <span id="memoryLabel">MEMORY</span>
                 <strong id="memoryText">0</strong>
             </div>
 
             <div class="counter waveCounter">
-                <span>WAVE</span>
+                <span id="waveLabel">WAVE</span>
                 <strong id="waveText">1</strong>
 
                 <div class="waveBar">
@@ -145,11 +145,11 @@
             </div>
 
             <div class="counter">
-                <span>COMBO</span>
+                <span id="comboLabel">COMBO</span>
                 <strong id="comboText">x1</strong>
             </div>
             <div class="counter">
-                <span>KILLS</span>
+                <span id="killsLabel">KILLS</span>
                 <strong id="killsText">0</strong>
             </div>
             <button id="pauseButton" class="pauseButton">
@@ -173,15 +173,21 @@
         <div id="bottomHUD">
 
             <div class="abilityCard">
-                <div class="abilityKey">Q</div>
+                <div class="abilityKey">CLICK</div>
                 <div class="abilityName">EYE</div>
+                <div class="cooldown" id="cooldownEye"></div>
+            </div>
+
+            <div class="abilityCard">
+                <div class="abilityKey">Q</div>
+                <div class="abilityName">THE CALL</div>
                 <div class="cooldown" id="cooldownQ"></div>
             </div>
 
             <div class="abilityCard">
-                <div class="abilityKey">W</div>
+                <div class="abilityKey">C</div>
                 <div class="abilityName">THORN</div>
-                <div class="cooldown" id="cooldownW"></div>
+                <div class="cooldown" id="cooldownC"></div>
             </div>
 
             <div class="abilityCard">
@@ -211,7 +217,7 @@
         </div>
 
         <div id="controlsText">
-            WASD MOVE &nbsp; | &nbsp; MOUSE AIM &nbsp; | &nbsp; CLICK / Q FIRE
+            WASD MOVE &nbsp; | &nbsp; MOUSE AIM &nbsp; | &nbsp; CLICK FIRE &nbsp; | &nbsp; Q CALL
         </div>
 
     </section>
@@ -223,7 +229,7 @@
 
             <div class="overlayHeader">PAUSED</div>
 
-            <div class="overlaySubtitle">
+            <div class="overlaySubtitle" id="pauseSubtitle">
                 THE SWARM IS WAITING
             </div>
 
@@ -235,7 +241,7 @@
                 RESTART
             </button>
 
-            <div class="pauseHint">
+            <div class="pauseHint" id="pauseHint">
                 ESC TO RESUME
             </div>
 
@@ -248,7 +254,7 @@
 
         <div class="upgradePanel">
 
-            <div class="overlayHeader">
+            <div class="overlayHeader" id="upgradeHeader">
                 MEMORY FRACTURE
             </div>
 
@@ -267,41 +273,41 @@
 
         <div class="overlayPanel">
 
-            <div class="overlayHeader">THE WITNESS FADES</div>
+            <div class="overlayHeader" id="gameOverHeader">THE WITNESS FADES</div>
 
-            <div class="overlaySubtitle">
+            <div class="overlaySubtitle" id="gameOverSubtitle">
                 THE SWARM REMEMBERS
             </div>
 
             <div class="stats">
 
                 <div>
-                    <span>WAVE</span>
+                    <span id="statWaveLabel">WAVE</span>
                     <strong id="finalWave">1</strong>
                 </div>
 
                 <div>
-                    <span>KILLS</span>
+                    <span id="statKillsLabel">KILLS</span>
                     <strong id="finalKills">0</strong>
                 </div>
 
                 <div>
-                    <span>ECHO</span>
+                    <span id="statEchoLabel">ECHO</span>
                     <strong id="finalEcho">0</strong>
                 </div>
 
                 <div>
-                    <span>MEMORY</span>
+                    <span id="statMemoryLabel">MEMORY</span>
                     <strong id="finalMemory">0</strong>
                 </div>
 
                 <div>
-                    <span>MAX COMBO</span>
+                    <span id="statComboLabel">MAX COMBO</span>
                     <strong id="finalCombo">x1</strong>
                 </div>
 
                 <div>
-                    <span>LARGEST CONVERGENCE</span>
+                    <span id="statConvergenceLabel">LARGEST CONVERGENCE</span>
                     <strong id="finalConvergence">0</strong>
                 </div>
 
