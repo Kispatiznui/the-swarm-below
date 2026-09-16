@@ -39,6 +39,202 @@ function angleTo(x1, y1, x2, y2) {
 }
 
 /* =========================================================
+   WAVE DESIGN
+========================================================= */
+
+const WAVE_ARCHETYPES = {
+
+    DEFAULT: {
+        countMult: 1,
+        hpMult: 1,
+        speedMult: 1,
+        intervalMult: 1,
+        expectedPopulation: 20
+    },
+
+    ENJAMBRE: {
+        countMult: 1.8,
+        hpMult: 0.75,
+        speedMult: 1.0,
+        intervalMult: 0.85,
+        expectedPopulation: 40
+    },
+
+    CAZA: {
+        countMult: 0.6,
+        hpMult: 0.9,
+        speedMult: 1.35,
+        intervalMult: 1.1,
+        expectedPopulation: 18
+    },
+
+    RESISTENCIA: {
+        countMult: 1.0,
+        hpMult: 1.5,
+        speedMult: 0.9,
+        intervalMult: 1.0,
+        expectedPopulation: 25
+    },
+
+    RESPIRO: {
+        countMult: 0.5,
+        hpMult: 0.85,
+        speedMult: 0.85,
+        intervalMult: 1.3,
+        expectedPopulation: 12
+    }
+};
+
+/* Index 0 = Wave 1. Wave 10 is boss-only, handled separately. */
+
+const WAVE_SEQUENCE = [
+
+    "DEFAULT",
+    "ENJAMBRE",
+    "CAZA",
+    "ENJAMBRE",
+    "RESISTENCIA",
+    "RESPIRO",
+    "ENJAMBRE",
+    "CAZA",
+    "RESISTENCIA"
+];
+
+/* Boss appearance schedule. Each entry maps a wave number
+   to the boss class that should spawn there. Multiple waves
+   can point to the same class (recurring bosses). */
+
+const BOSS_SEQUENCE = {
+
+    5: "HARBINGER",
+    10: "ABERRATION",
+    15: "HOLLOW_CHOIR",
+    17: "HARBINGER",
+    20: "DEEP_MAW",
+    23: "HARBINGER",
+    25: "WATCHER_BENEATH",
+    28: "ABERRATION",
+    30: "UNRAVELING",
+    32: "HARBINGER",
+    35: "ABERRATION",
+    37: "TAYATNA"
+};
+
+function createBossInstance(bossKey, game) {
+
+    if (bossKey === "HARBINGER") {
+        return new HarbingerBoss(game);
+    }
+
+    if (bossKey === "ABERRATION") {
+        return new AberrationBoss(game);
+    }
+
+    /* Placeholder classes for bosses not yet designed.
+       Returning null means BOSS_SEQUENCE will simply be
+       skipped for that wave until the class is implemented
+       in a later task. */
+
+    return null;
+}
+
+function getWaveArchetype(wave) {
+
+    if (wave === 10) {
+        return WAVE_ARCHETYPES.DEFAULT;
+    }
+
+    if (wave <= WAVE_SEQUENCE.length) {
+
+        const key =
+            WAVE_SEQUENCE[wave - 1];
+
+        return WAVE_ARCHETYPES[key];
+    }
+
+    /* Beyond wave 9, loop the wave 2-9 pattern indefinitely */
+
+    const cycleLength =
+        WAVE_SEQUENCE.length - 1;
+
+    const loopIndex =
+        ((wave - 1) % cycleLength) + 1;
+
+    const key =
+        WAVE_SEQUENCE[loopIndex];
+
+    return WAVE_ARCHETYPES[key] || WAVE_ARCHETYPES.DEFAULT;
+}
+
+function getWavePhaseMultiplier(elapsed, waveDuration) {
+
+    const progress =
+        elapsed / waveDuration;
+
+    if (progress < 0.27) {
+
+        /* ENTRADA */
+        return 1.3;
+    }
+
+    if (progress < 0.67) {
+
+        /* PRESIÓN */
+        return 1.0;
+    }
+
+    /* SATURACIÓN */
+    return 0.65;
+}
+
+function calculateSwarmPressure(game) {
+
+    const archetype =
+        getWaveArchetype(game.wave);
+
+    const aliveFragments =
+        game.fragments.filter(
+            f => !f.dead
+        );
+
+    const fragmentRatio =
+        clamp(
+            aliveFragments.length /
+            archetype.expectedPopulation,
+            0,
+            1
+        );
+
+    let largestCluster = 0;
+
+    for (const fragment of aliveFragments) {
+
+        if (
+            fragment.clusterSize >
+            largestCluster
+        ) {
+
+            largestCluster =
+                fragment.clusterSize;
+        }
+    }
+
+    const clusterFactor =
+        clamp(
+            largestCluster / 25,
+            0,
+            1
+        );
+
+    return clamp(
+        (fragmentRatio * 0.5) +
+        (clusterFactor * 0.5),
+        0,
+        1
+    );
+}
+
+/* =========================================================
    LANGUAGE
 ========================================================= */
 
@@ -73,7 +269,7 @@ const TEXT = {
 
         echoTitle: "ECHO",
         echoText:
-            "Defeated FRAGMENTS leave ECHO behind. Collect it physically. ECHO is used to strengthen your abilities.",
+            "Defeated FRAGMENTS leave ECHO behind. Collect it physically, or use THE CALL to pull it all toward you at once. ECHO is used to strengthen your abilities.",
 
         convergenceTitle: "CONVERGENCE",
         convergenceText:
@@ -81,7 +277,7 @@ const TEXT = {
 
         abilitiesTitle: "DEFENSES",
         abilitiesText:
-            "Q fires THE EYE. W releases THORN. E creates GRAVITY WOMB. R unleashes CHORUS. F uses THE MOUTH. SPACE performs DASH.",
+            "CLICK fires THE EYE. Q performs THE CALL. C releases THORN. E creates GRAVITY WOMB. R unleashes CHORUS. F uses THE MOUTH. SPACE performs DASH.",
 
         tutorialStart: "BEGIN",
 
@@ -113,6 +309,13 @@ const TEXT = {
         aberrationDescends: "ABERRATION DESCENDS",
         aberrationDestroyed: "ABERRATION DESTROYED",
         aberrationReward: "+2500 ECHO  +5 MEMORY",
+
+        harbingerDescends: "THE HARBINGER RISES",
+        harbingerDestroyed: "THE HARBINGER FALLS",
+        harbingerReward: "+800 ECHO  +2 MEMORY",
+
+        bossTitleAberration: "ABERRATION",
+        bossTitleHarbinger: "THE HARBINGER",
         gravityWombEvent: "GRAVITY WOMB",
         chorusEvent: "CHORUS",
         mouthEvent: "THE MOUTH +{n}",
@@ -182,7 +385,7 @@ const TEXT = {
 
         echoTitle: "ECHO",
         echoText:
-            "Los FRAGMENTS derrotados dejan ECHO. Debes recogerlo físicamente. ECHO sirve para fortalecer tus habilidades.",
+            "Los FRAGMENTS derrotados dejan ECHO. Recógelo físicamente, o usa THE CALL para atraerlo todo hacia ti de una vez. ECHO sirve para fortalecer tus habilidades.",
 
         convergenceTitle: "CONVERGENCIA",
         convergenceText:
@@ -190,7 +393,7 @@ const TEXT = {
 
         abilitiesTitle: "DEFENSAS",
         abilitiesText:
-            "Q dispara THE EYE. W libera THORN. E crea GRAVITY WOMB. R libera CHORUS. F usa THE MOUTH. SPACE ejecuta DASH.",
+            "CLICK dispara THE EYE. Q ejecuta THE CALL. C libera THORN. E crea GRAVITY WOMB. R libera CHORUS. F usa THE MOUTH. SPACE ejecuta DASH.",
 
         tutorialStart: "COMENZAR",
 
@@ -222,6 +425,13 @@ const TEXT = {
         aberrationDescends: "LA ABERRACIÓN DESCIENDE",
         aberrationDestroyed: "ABERRACIÓN DESTRUIDA",
         aberrationReward: "+2500 ECHO  +5 MEMORIA",
+
+        harbingerDescends: "THE HARBINGER EMERGE",
+        harbingerDestroyed: "THE HARBINGER CAE",
+        harbingerReward: "+800 ECHO  +2 MEMORIA",
+
+        bossTitleAberration: "ABERRATION",
+        bossTitleHarbinger: "THE HARBINGER",
         gravityWombEvent: "GRAVITY WOMB",
         chorusEvent: "CHORUS",
         mouthEvent: "THE MOUTH +{n}",
@@ -427,7 +637,7 @@ const tutorialPages = [
         text: "convergenceText"
     },
     {
-        visual: "Q W E R F",
+        visual: "CLICK Q C E R F",
         title: "abilitiesTitle",
         text: "abilitiesText"
     }
@@ -2425,6 +2635,12 @@ class AberrationBoss {
 
         this.dead = false;
 
+        this.labelKey =
+            "bossTitleAberration";
+
+        this.arrivalKey =
+            "aberrationDescends";
+
         this.phase = 0;
 
         this.spawnTimer = 2500;
@@ -2696,6 +2912,344 @@ class AberrationBoss {
             0,
             16,
             7,
+            this.phase,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        ctx.restore();
+    }
+}
+
+/* =========================================================
+   THE HARBINGER (WAVE 5 MINI-BOSS)
+========================================================= */
+
+class HarbingerBoss {
+
+    constructor(game) {
+
+        this.game = game;
+
+        this.x =
+            canvas.width / 2;
+
+        this.y = 100;
+
+        this.radius = 38;
+
+        this.maxHp = 900;
+
+        this.hp =
+            this.maxHp;
+
+        this.dead = false;
+
+        this.labelKey =
+            "bossTitleHarbinger";
+
+        this.arrivalKey =
+            "harbingerDescends";
+
+        this.phase = 0;
+
+        this.chargeState = "approach";
+
+        this.chargeTimer =
+            random(1500, 2500);
+
+        this.chargeTargetX = 0;
+        this.chargeTargetY = 0;
+
+        this.spawnTimer =
+            random(4000, 6000);
+    }
+
+    update(dt, game) {
+
+        this.phase += dt * 0.0015;
+
+        this.chargeTimer -= dt;
+
+        if (this.chargeState === "approach") {
+
+            const dir =
+                normalize(
+                    game.witness.x - this.x,
+                    game.witness.y - this.y
+                );
+
+            this.x +=
+                dir.x * 0.05 * dt;
+
+            this.y +=
+                dir.y * 0.05 * dt;
+
+            if (this.chargeTimer <= 0) {
+
+                this.chargeState = "charge";
+                this.chargeTimer = 500;
+
+                this.chargeTargetX =
+                    game.witness.x;
+
+                this.chargeTargetY =
+                    game.witness.y;
+
+                game.particles.ring(
+                    this.x,
+                    this.y,
+                    50,
+                    "energy"
+                );
+            }
+        }
+
+        else {
+
+            const dir =
+                normalize(
+                    this.chargeTargetX - this.x,
+                    this.chargeTargetY - this.y
+                );
+
+            this.x +=
+                dir.x * 0.14 * dt;
+
+            this.y +=
+                dir.y * 0.14 * dt;
+
+            if (this.chargeTimer <= 0) {
+
+                this.chargeState = "approach";
+                this.chargeTimer =
+                    random(1800, 2800);
+            }
+        }
+
+        this.x =
+            clamp(
+                this.x,
+                this.radius,
+                canvas.width - this.radius
+            );
+
+        this.y =
+            clamp(
+                this.y,
+                this.radius,
+                canvas.height - this.radius
+            );
+
+        this.spawnTimer -= dt;
+
+        if (this.spawnTimer <= 0) {
+
+            this.spawnTimer =
+                random(4000, 6000);
+
+            for (let i = 0; i < 2; i++) {
+
+                const spawnAngle =
+                    random(0, Math.PI * 2);
+
+                game.spawnFragmentNear(
+                    this.x +
+                    Math.cos(spawnAngle) * 60,
+                    this.y +
+                    Math.sin(spawnAngle) * 60,
+                    1
+                );
+            }
+        }
+
+        const d =
+            distance(
+                this.x,
+                this.y,
+                game.witness.x,
+                game.witness.y
+            );
+
+        if (
+            d <
+            this.radius + 
+            game.witness.radius
+        ) {
+
+            game.witness.damage(10);
+        }
+    }
+
+    damage(amount) {
+
+        if (this.dead) {
+            return;
+        }
+
+        this.hp -= amount;
+
+        if (this.hp <= 0) {
+
+            this.hp = 0;
+
+            this.dead = true;
+
+            this.game.echo += 800;
+            this.game.memory += 2;
+
+            this.game.showEvent(
+                t("harbingerDestroyed")
+            );
+
+            this.game.showPickup(
+                t("harbingerReward")
+            );
+
+            this.game.particles.burst(
+                this.x,
+                this.y,
+                50,
+                "death",
+                1.6
+            );
+
+            this.game.particles.ring(
+                this.x,
+                this.y,
+                60,
+                "energy"
+            );
+
+            this.game.boss = null;
+        }
+    }
+
+    render(ctx) {
+
+        if (this.dead) {
+            return;
+        }
+
+        ctx.save();
+
+        const charging =
+            this.chargeState === "charge";
+
+        const pulse =
+            Math.sin(this.phase * 3) * 4;
+
+        ctx.shadowBlur =
+            charging ? 32 : 20;
+
+        ctx.shadowColor =
+            "#004d40";
+
+        ctx.translate(
+            this.x,
+            this.y
+        );
+
+        ctx.strokeStyle =
+            "#004d40";
+
+        ctx.fillStyle =
+            "#050509";
+
+        ctx.lineWidth =
+            charging ? 3 : 2;
+
+        ctx.beginPath();
+
+        for (let i = 0; i < 10; i++) {
+
+            const angle =
+                i *
+                Math.PI *
+                2 / 10;
+
+            const radius =
+                this.radius +
+                Math.sin(
+                    this.phase * 2 + i
+                ) * 5 +
+                pulse;
+
+            const x =
+                Math.cos(angle) * radius;
+
+            const y =
+                Math.sin(angle) * radius;
+
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            }
+            else {
+                ctx.lineTo(x, y);
+            }
+        }
+
+        ctx.closePath();
+
+        ctx.fill();
+        ctx.stroke();
+
+        /* APPENDAGES */
+
+        for (let i = 0; i < 4; i++) {
+
+            const angle =
+                i *
+                Math.PI /
+                2 +
+                this.phase * 0.4;
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                Math.cos(angle) * 22,
+                Math.sin(angle) * 22
+            );
+
+            ctx.lineTo(
+                Math.cos(angle) * 58,
+                Math.sin(angle) * 58
+            );
+
+            ctx.stroke();
+        }
+
+        /* VOID */
+
+        ctx.fillStyle =
+            "#000000";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            18,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        /* EYE */
+
+        ctx.fillStyle =
+            "#ffffcc";
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            0,
+            0,
+            10,
+            4.5,
             this.phase,
             0,
             Math.PI * 2
@@ -3837,6 +4391,9 @@ class Game {
 
         this.boss = null;
 
+        this.triggeredBossWaves =
+            new Set();
+
         this.echo = 0;
         this.memory = 0;
 
@@ -3860,6 +4417,8 @@ class Game {
 
         this.waveTimer =
             this.waveDuration;
+
+        this.waveAdjusted = false;
 
         this.spawnTimer = 0;
 
@@ -3956,6 +4515,9 @@ class Game {
 
         this.boss = null;
 
+        this.triggeredBossWaves =
+            new Set();
+
         this.echo = 0;
         this.memory = 0;
 
@@ -3976,6 +4538,8 @@ class Game {
 
         this.waveTimer =
             this.waveDuration;
+
+        this.waveAdjusted = false;
 
         this.spawnTimer =
             500;
@@ -4190,17 +4754,21 @@ class Game {
             return;
         }
 
+        const archetype =
+            getWaveArchetype(this.wave);
+
         const hp =
-            25 +
-            power * 4 +
-            random(
-                0,
-                10
-            );
+            (
+                25 +
+                power * 4 +
+                random(0, 10)
+            ) * archetype.hpMult;
 
         const speed =
-            0.045 +
-            this.wave * 0.0015;
+            (
+                0.045 +
+                this.wave * 0.0015
+            ) * archetype.speedMult;
 
         this.fragments.push(
             new Fragment(
@@ -4302,6 +4870,41 @@ class Game {
         this.waveTimer -=
             dt;
 
+        /* WAVE PRESSURE ADJUSTMENT — evaluated once, near the
+           end of the base 30s, using combined swarm density
+           and largest active cluster as the pressure signal. */
+
+        if (
+            this.waveTimer <= 4000 &&
+            !this.waveAdjusted
+        ) {
+
+            this.waveAdjusted = true;
+
+            const pressure =
+                calculateSwarmPressure(this);
+
+            if (pressure <= 0.3) {
+
+                const subtractAmount =
+                    ((0.3 - pressure) / 0.3) *
+                    4000;
+
+                this.waveTimer -=
+                    subtractAmount;
+            }
+
+            else if (pressure >= 0.7) {
+
+                const addAmount =
+                    ((pressure - 0.7) / 0.3) *
+                    4000;
+
+                this.waveTimer +=
+                    addAmount;
+            }
+        }
+
         if (
             this.waveTimer <= 0
         ) {
@@ -4311,51 +4914,100 @@ class Game {
             this.waveTimer =
                 this.waveDuration;
 
+            this.waveAdjusted = false;
+
             this.showEvent(
                 t("waveEvent", { n: this.wave })
             );
 
+            const bossKey =
+                BOSS_SEQUENCE[this.wave];
+
             if (
-                this.wave === 10 &&
+                bossKey &&
+                !this.triggeredBossWaves.has(this.wave) &&
                 !this.boss
             ) {
 
-                this.boss =
-                    new AberrationBoss(
+                const bossInstance =
+                    createBossInstance(
+                        bossKey,
                         this
                     );
 
-                this.showEvent(
-                    t("aberrationDescends")
-                );
+                if (bossInstance) {
+
+                    this.boss =
+                        bossInstance;
+
+                    this.triggeredBossWaves.add(
+                        this.wave
+                    );
+
+                    this.showEvent(
+                        t(
+                            bossInstance.arrivalKey ||
+                            "aberrationDescends"
+                        )
+                    );
+                }
             }
         }
 
-        /* SPAWNING */
+                /* SPAWNING */
+        /* Boss room: while a boss is active, no new swarm
+           fragments enter the map. Existing ones must be
+           cleared by the player, but nothing new spawns
+           until the boss is defeated. */
 
         this.spawnTimer -=
             dt;
 
         if (
+            !this.boss &&
             this.spawnTimer <= 0 &&
             this.fragments.length <
             this.maxFragments
         ) {
 
-            const interval =
+            const archetype =
+                getWaveArchetype(this.wave);
+
+            const elapsed =
+                this.waveDuration -
+                this.waveTimer;
+
+            const phaseMult =
+                getWavePhaseMultiplier(
+                    elapsed,
+                    this.waveDuration
+                );
+
+            const baseInterval =
                 Math.max(
                     220,
                     1100 -
                     this.wave * 65
                 );
 
+            const interval =
+                Math.max(
+                    150,
+                    baseInterval *
+                    archetype.intervalMult *
+                    phaseMult
+                );
+
             this.spawnTimer =
                 interval;
 
             const count =
-                this.wave >= 8
-                    ? 2
-                    : 1;
+                Math.max(
+                    1,
+                    Math.round(
+                        archetype.countMult
+                    )
+                );
 
             for (
                 let i = 0;
@@ -4806,6 +5458,20 @@ class Game {
             bossHUD.classList.remove(
                 "hidden"
             );
+
+            const bossTitleElement =
+                document.getElementById(
+                    "bossTitle"
+                );
+
+            if (bossTitleElement) {
+
+                bossTitleElement.textContent =
+                    t(
+                        this.boss.labelKey ||
+                        "bossTitleAberration"
+                    );
+            }
 
             bossFill.style.width =
                 `${
