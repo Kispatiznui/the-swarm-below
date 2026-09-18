@@ -330,6 +330,8 @@ const TEXT = {
             "WASD MOVE | MOUSE AIM | CLICK FIRE | Q CALL",
 
         waveEvent: "WAVE {n}",
+        mapTransitionTier2: "THE DESCENT NARROWS",
+        mapTransitionTier3: "THE DEPTHS CLOSE IN",
         aberrationDescends: "ABERRATION DESCENDS",
         aberrationDestroyed: "ABERRATION DESTROYED",
         aberrationReward: "+2500 ECHO  +5 MEMORY",
@@ -478,6 +480,8 @@ const TEXT = {
             "WASD MOVER | MOUSE APUNTAR | CLICK DISPARAR | Q LLAMAR",
 
         waveEvent: "OLA {n}",
+        mapTransitionTier2: "EL DESCENSO SE ESTRECHA",
+        mapTransitionTier3: "LAS PROFUNDIDADES SE CIERRAN",
         aberrationDescends: "LA ABERRACIÓN DESCIENDE",
         aberrationDestroyed: "ABERRACIÓN DESTRUIDA",
         aberrationReward: "+2500 ECHO  +5 MEMORIA",
@@ -6491,6 +6495,9 @@ class Game {
 
         this.maxFragments = 150;
 
+        this.mapTier = 1;
+        this.mapAccentColor = "25,25,112";
+
         this.echoMultiplier = 1;
 
         this.memoryDropChance =
@@ -6533,45 +6540,101 @@ class Game {
         );
     }
 
-    createMap() {
+    createMap(tier = 1) {
 
-        this.obstacles = [
+        this.mapTier = tier;
 
-            new Obstacle(
-                300,
-                210,
-                120,
-                55
-            ),
+        if (tier === 1) {
 
-            new Obstacle(
-                770,
-                180,
-                120,
-                55
-            ),
+            this.mapAccentColor = "25,25,112";
 
-            new Obstacle(
-                480,
-                480,
-                240,
-                45
-            ),
+            this.obstacles = [
 
-            new Obstacle(
-                90,
-                430,
-                100,
-                60
-            ),
+                new Obstacle(300, 210, 120, 55),
+                new Obstacle(770, 180, 120, 55),
+                new Obstacle(480, 480, 240, 45),
+                new Obstacle(90, 430, 100, 60),
+                new Obstacle(970, 420, 100, 60)
+            ];
+        }
 
-            new Obstacle(
-                970,
-                420,
-                100,
-                60
-            )
-        ];
+        else if (tier === 2) {
+
+            this.mapAccentColor = "90,20,70";
+
+            this.obstacles = [
+
+                new Obstacle(200, 150, 110, 50),
+                new Obstacle(890, 150, 110, 50),
+                new Obstacle(550, 130, 100, 45),
+                new Obstacle(150, 510, 110, 55),
+                new Obstacle(940, 510, 110, 55),
+                new Obstacle(50, 300, 90, 160),
+                new Obstacle(1060, 300, 90, 160)
+            ];
+        }
+
+        else {
+
+            this.mapAccentColor = "139,0,0";
+
+            this.obstacles = [
+
+                new Obstacle(400, 190, 100, 50),
+                new Obstacle(700, 190, 100, 50),
+                new Obstacle(250, 300, 80, 140),
+                new Obstacle(870, 300, 80, 140),
+                new Obstacle(400, 540, 100, 50),
+                new Obstacle(700, 540, 100, 50),
+                new Obstacle(550, 110, 100, 40),
+                new Obstacle(550, 570, 100, 40)
+            ];
+        }
+
+        this.repositionWitnessIfStuck();
+    }
+
+    getMapTierForWave(wave) {
+
+        if (wave <= 15) {
+            return 1;
+        }
+
+        if (wave <= 30) {
+            return 2;
+        }
+
+        return 3;
+    }
+
+    repositionWitnessIfStuck() {
+
+        if (!this.witness) {
+            return;
+        }
+
+        for (const obstacle of this.obstacles) {
+
+            if (
+                obstacle.collidesCircle(
+                    this.witness.x,
+                    this.witness.y,
+                    this.witness.radius
+                )
+            ) {
+
+                this.witness.x =
+                    canvas.width / 2;
+
+                this.witness.y =
+                    canvas.height / 2;
+
+                this.witness.vx = 0;
+                this.witness.vy = 0;
+
+                return;
+            }
+        }
     }
 
     startNewRun() {
@@ -6628,6 +6691,8 @@ class Game {
 
         this.defense =
             new DefenseSystem(this);
+
+        this.createMap(1);
 
         titleScreen.classList.add(
             "hidden"
@@ -7012,6 +7077,23 @@ class Game {
             this.showEvent(
                 t("waveEvent", { n: this.wave })
             );
+
+            const targetMapTier =
+                this.getMapTierForWave(this.wave);
+
+            if (targetMapTier !== this.mapTier) {
+
+                this.createMap(targetMapTier);
+
+                const mapKey =
+                    targetMapTier === 2
+                        ? "mapTransitionTier2"
+                        : "mapTransitionTier3";
+
+                this.showEvent(
+                    t(mapKey)
+                );
+            }
 
             const bossKey =
                 BOSS_SEQUENCE[this.wave];
@@ -7683,7 +7765,7 @@ class Game {
 
         gradient.addColorStop(
             0,
-            "rgba(25,25,112,0)"
+            `rgba(${this.mapAccentColor},0)`
         );
 
         gradient.addColorStop(

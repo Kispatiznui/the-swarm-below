@@ -696,6 +696,140 @@ footer span {
 }
 
 /* =========================================================
+   THE DESCENT (BOSSES)
+========================================================= */
+
+.bosses {
+    border-top: 1px solid #171b1a;
+}
+
+.bossGrid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 12px;
+
+    width: 100%;
+    min-width: 0;
+}
+
+.bossCard {
+    min-width: 0;
+    min-height: 170px;
+
+    padding: 28px;
+
+    background: #0d100f;
+    border: 1px solid #202725;
+    border-left: 2px solid #8b0000;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.bossCard:hover {
+    transform: translateY(-4px);
+    border-left-color: #a00000;
+}
+
+.bossWave {
+    color: #8b0000;
+    font-size: 0.7rem;
+    letter-spacing: 0.2rem;
+    font-weight: bold;
+}
+
+.bossCard h3 {
+    margin-top: 18px;
+
+    color: #eeeeea;
+    font-size: 1.05rem;
+    letter-spacing: 0.08rem;
+
+    overflow-wrap: break-word;
+}
+
+.bossCard p {
+    margin-top: 12px;
+
+    color: #858b88;
+    font-size: 0.9rem;
+
+    overflow-wrap: break-word;
+}
+
+.bossCard.bossFinal {
+    border-left-color: #ffffcc;
+    background:
+        linear-gradient(
+            135deg,
+            #0d100f,
+            #150a0a
+        );
+}
+
+.bossCard.bossFinal .bossWave {
+    color: #ffffcc;
+}
+
+/* =========================================================
+   FIELD NOTES
+========================================================= */
+
+.fieldNotes {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+
+    padding-left: 5%;
+    padding-right: 5%;
+
+    background: #0b0e0d;
+}
+
+.noteGrid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 15px;
+
+    width: 100%;
+    min-width: 0;
+}
+
+.note {
+    min-width: 0;
+    min-height: 150px;
+
+    padding: 30px;
+
+    background: #101413;
+    border: 1px solid #1a211f;
+}
+
+.note h3 {
+    color: #6fa89e;
+    font-size: 0.85rem;
+    letter-spacing: 0.1rem;
+
+    overflow-wrap: break-word;
+}
+
+.note p {
+    margin-top: 14px;
+
+    color: #858b88;
+    font-size: 0.9rem;
+
+    overflow-wrap: break-word;
+}
+
+/* =========================================================
    RESPONSIVE
 ========================================================= */
 
@@ -716,6 +850,16 @@ footer span {
     }
 
     .abilityGrid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .bossGrid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .noteGrid {
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
     }
@@ -769,7 +913,9 @@ footer span {
     .systemGrid,
     .abilityGrid,
     .controlGrid,
-    .screenshotGrid {
+    .screenshotGrid,
+    .bossGrid,
+    .noteGrid {
         grid-template-columns: 1fr;
     }
 
