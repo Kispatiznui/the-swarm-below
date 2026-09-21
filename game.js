@@ -130,6 +130,26 @@ function createBossInstance(bossKey, game) {
         return new AberrationBoss(game);
     }
 
+    if (bossKey === "HOLLOW_CHOIR") {
+        return new HollowChoirBoss(game);
+    }
+
+    if (bossKey === "DEEP_MAW") {
+        return new DeepMawBoss(game);
+    }
+
+    if (bossKey === "WATCHER_BENEATH") {
+        return new WatcherBeneathBoss(game);
+    }
+
+    if (bossKey === "UNRAVELING") {
+        return new UnravelingBoss(game);
+    }
+
+    if (bossKey === "TAYATNA") {
+        return new TayatnaBoss(game);
+    }
+
     /* Placeholder classes for bosses not yet designed.
        Returning null means BOSS_SEQUENCE will simply be
        skipped for that wave until the class is implemented
@@ -279,6 +299,10 @@ const TEXT = {
         abilitiesText:
             "CLICK fires THE EYE. Q performs THE CALL. C releases THORN. E creates GRAVITY WOMB. R unleashes CHORUS. F uses THE MOUTH. SPACE performs DASH.",
 
+        bossProgressionTitle: "WHAT RISES BELOW",
+        bossProgressionText:
+            "Every few waves, something ancient rises to meet you. Survive their arrival — what follows will only grow heavier.",
+
         tutorialStart: "BEGIN",
 
         memoryFracture: "MEMORY FRACTURE",
@@ -306,6 +330,8 @@ const TEXT = {
             "WASD MOVE | MOUSE AIM | CLICK FIRE | Q CALL",
 
         waveEvent: "WAVE {n}",
+        mapTransitionTier2: "THE DESCENT NARROWS",
+        mapTransitionTier3: "THE DEPTHS CLOSE IN",
         aberrationDescends: "ABERRATION DESCENDS",
         aberrationDestroyed: "ABERRATION DESTROYED",
         aberrationReward: "+2500 ECHO  +5 MEMORY",
@@ -316,9 +342,44 @@ const TEXT = {
 
         bossTitleAberration: "ABERRATION",
         bossTitleHarbinger: "THE HARBINGER",
-        gravityWombEvent: "GRAVITY WOMB",
+        bossTitleHollowChoir: "THE HOLLOW CHOIR",
+        bossTitleDeepMaw: "THE DEEP MAW",
+        bossTitleWatcher: "THE WATCHER BENEATH",
+        bossTitleUnraveling: "THE UNRAVELING",
+        bossTitleTayatna: "TAYATNA",
+
+        tayatnaDescends: "TAYATNA STIRS BENEATH",
+        tayatnaSorrow: "THE WEIGHT SETTLES",
+        tayatnaDeepens: "THE GRIEF DEEPENS",
+        tayatnaDestroyed: "TAYATNA FALLS SILENT",
+        tayatnaReward: "+4000 ECHO  +10 MEMORY",
+
+        victoryTitle: "THE DESCENT ENDS",
+        victoryLine:
+            "The Witness remains. Whatever waited below has gone still.",
+        victoryContinue: "CONTINUE",
+        creditsRestart: "BEGIN AGAIN",
+
+        hollowChoirDescends: "THE HOLLOW CHOIR AWAKENS",
+        hollowChoirDestroyed: "THE HOLLOW CHOIR IS SILENCED",
+        hollowChoirReward: "+1200 ECHO  +3 MEMORY",
+
+        deepMawDescends: "THE DEEP MAW SURFACES",
+        deepMawDestroyed: "THE DEEP MAW COLLAPSES",
+        deepMawReward: "+1800 ECHO  +4 MEMORY",
+
+        watcherDescends: "SOMETHING OPENS ITS EYE",
+        watcherDestroyed: "THE WATCHER BENEATH CLOSES",
+        watcherReward: "+1500 ECHO  +3 MEMORY",
+
+        unravelingDescends: "SOMETHING BEGINS TO COME APART",
+        unravelingFragments: "THE UNRAVELING SPLITS",
+        unravelingDestroyed: "THE UNRAVELING CEASES",
+        unravelingReward: "+1900 ECHO  +4 MEMORY",
+
         chorusEvent: "CHORUS",
         mouthEvent: "THE MOUTH +{n}",
+        mouthEmpty: "NOTHING WEAK ENOUGH TO CONSUME",
         theCallEvent: "THE CALL",
         gatherEcho: "GATHER ECHO FOR AN UPGRADE",
 
@@ -395,6 +456,10 @@ const TEXT = {
         abilitiesText:
             "CLICK dispara THE EYE. Q ejecuta THE CALL. C libera THORN. E crea GRAVITY WOMB. R libera CHORUS. F usa THE MOUTH. SPACE ejecuta DASH.",
 
+        bossProgressionTitle: "LO QUE SE ALZA DESDE ABAJO",
+        bossProgressionText:
+            "Cada cierto número de oleadas, algo ancestral se alza a tu encuentro. Sobrevive su llegada — lo que sigue después solo se volverá más pesado.",
+
         tutorialStart: "COMENZAR",
 
         memoryFracture: "FRACTURA DE MEMORIA",
@@ -422,6 +487,8 @@ const TEXT = {
             "WASD MOVER | MOUSE APUNTAR | CLICK DISPARAR | Q LLAMAR",
 
         waveEvent: "OLA {n}",
+        mapTransitionTier2: "EL DESCENSO SE ESTRECHA",
+        mapTransitionTier3: "LAS PROFUNDIDADES SE CIERRAN",
         aberrationDescends: "LA ABERRACIÓN DESCIENDE",
         aberrationDestroyed: "ABERRACIÓN DESTRUIDA",
         aberrationReward: "+2500 ECHO  +5 MEMORIA",
@@ -432,9 +499,39 @@ const TEXT = {
 
         bossTitleAberration: "ABERRATION",
         bossTitleHarbinger: "THE HARBINGER",
+        bossTitleHollowChoir: "THE HOLLOW CHOIR",
+        bossTitleDeepMaw: "THE DEEP MAW",
+        bossTitleWatcher: "THE WATCHER BENEATH",
+        bossTitleUnraveling: "THE UNRAVELING",
+        bossTitleTayatna: "TAYATNA",
+
+        tayatnaDescends: "TAYATNA SE REMUEVE EN LO PROFUNDO",
+        tayatnaSorrow: "EL PESO SE ASIENTA",
+        tayatnaDeepens: "LA PENA SE PROFUNDIZA",
+        tayatnaDestroyed: "TAYATNA GUARDA SILENCIO",
+        tayatnaReward: "+4000 ECHO  +10 MEMORIA",
+
+        hollowChoirDescends: "EL CORO HUECO DESPIERTA",
+        hollowChoirDestroyed: "EL CORO HUECO ENMUDECE",
+        hollowChoirReward: "+1200 ECHO  +3 MEMORIA",
+
+        deepMawDescends: "LAS FAUCES PROFUNDAS EMERGEN",
+        deepMawDestroyed: "LAS FAUCES PROFUNDAS COLAPSAN",
+        deepMawReward: "+1800 ECHO  +4 MEMORIA",
+
+        watcherDescends: "ALGO ABRE SU OJO",
+        watcherDestroyed: "EL VIGILANTE DE ABAJO SE CIERRA",
+        watcherReward: "+1500 ECHO  +3 MEMORIA",
+
+        unravelingDescends: "ALGO EMPIEZA A DESHACERSE",
+        unravelingFragments: "THE UNRAVELING SE PARTE",
+        unravelingDestroyed: "THE UNRAVELING CESA",
+        unravelingReward: "+1900 ECHO  +4 MEMORIA",
+
         gravityWombEvent: "GRAVITY WOMB",
         chorusEvent: "CHORUS",
         mouthEvent: "THE MOUTH +{n}",
+        mouthEmpty: "NADA LO BASTANTE DÉBIL PARA CONSUMIR",
         theCallEvent: "THE CALL",
         gatherEcho: "REÚNE ECHO PARA UNA MEJORA",
 
@@ -565,6 +662,18 @@ const gameOverScreen =
 const retryButton =
     document.getElementById("retryButton");
 
+const victoryScreen =
+    document.getElementById("victoryScreen");
+
+const victoryContinueButton =
+    document.getElementById("victoryContinueButton");
+
+const creditsScreen =
+    document.getElementById("creditsScreen");
+
+const creditsRestartButton =
+    document.getElementById("creditsRestartButton");
+
 /* =========================================================
    HUD
 ========================================================= */
@@ -640,6 +749,11 @@ const tutorialPages = [
         visual: "CLICK Q C E R F",
         title: "abilitiesTitle",
         text: "abilitiesText"
+    },
+    {
+        visual: "5 · 10 · 15 · 20 · 25 · 30 · 35",
+        title: "bossProgressionTitle",
+        text: "bossProgressionText"
     }
 ];
 
@@ -799,6 +913,18 @@ function updateInterfaceLanguage() {
     document.getElementById("statConvergenceLabel").textContent =
         t("largestConvergence");
 
+    document.getElementById("victoryHeader").textContent =
+        t("victoryTitle");
+
+    document.getElementById("victoryNarrativeLine").textContent =
+        t("victoryLine");
+
+    victoryContinueButton.textContent =
+        t("victoryContinue");
+
+    creditsRestartButton.textContent =
+        t("creditsRestart");
+
     updateTutorial();
 }
 
@@ -876,6 +1002,30 @@ class InputSystem {
         window.addEventListener("mouseup", event => {
 
             if (event.button === 0) {
+                this.mouse.down = false;
+            }
+        });
+
+        /* CRITICAL FIX: without this, a keyup event missed during
+           a window focus loss (alt-tab, clicking outside the
+           canvas, OS-level focus steal) leaves that key "stuck"
+           as pressed forever, since InputSystem is a singleton
+           that persists across every retry for the whole browser
+           session. This clears all held keys the moment focus
+           is lost, preventing phantom input from accumulating
+           across multiple runs. */
+
+        window.addEventListener("blur", () => {
+
+            this.keys = {};
+            this.mouse.down = false;
+        });
+
+        document.addEventListener("visibilitychange", () => {
+
+            if (document.hidden) {
+
+                this.keys = {};
                 this.mouse.down = false;
             }
         });
@@ -1254,7 +1404,7 @@ class Drop {
 
         else if (this.type === "heal") {
 
-            ctx.strokeStyle = "#999999";
+            ctx.strokeStyle = "#8b0000";
 
             ctx.beginPath();
 
@@ -1425,6 +1575,11 @@ class Witness {
         this.lastDash = -Infinity;
 
         this.dashUntil = 0;
+
+        this.slowUntil = 0;
+        this.slowFactor = 1;
+
+        this.feedFlash = 0;
     }
 
     reset() {
@@ -1448,29 +1603,59 @@ class Witness {
         this.damageFlash = 0;
         this.lastDash = -Infinity;
         this.dashUntil = 0;
+
+        this.slowUntil = 0;
+        this.slowFactor = 1;
+
+        this.feedFlash = 0;
     }
 
     update(dt, game) {
 
+        const dashLocked =
+            performance.now() <
+            this.dashUntil;
+
         let dx = 0;
         let dy = 0;
 
-        if (game.input.isDown("w")) dy--;
-        if (game.input.isDown("s")) dy++;
-        if (game.input.isDown("a")) dx--;
-        if (game.input.isDown("d")) dx++;
+        /* While dashing, movement input is ignored entirely.
+           Direction is locked the instant the dash begins;
+           only the existing damping (applied further below)
+           is allowed to bleed off the dash velocity. This
+           makes the dash a committed, decisive displacement
+           instead of a redirectable slide. */
+
+        if (!dashLocked) {
+
+            if (game.input.isDown("w")) dy--;
+            if (game.input.isDown("s")) dy++;
+            if (game.input.isDown("a")) dx--;
+            if (game.input.isDown("d")) dx++;
+        }
 
         const dir =
             normalize(dx, dy);
 
+        const slowActive =
+            performance.now() <
+            this.slowUntil;
+
+        const slowMult =
+            slowActive
+                ? this.slowFactor
+                : 1;
+
         this.vx +=
             dir.x *
             this.acceleration *
+            slowMult *
             dt;
 
         this.vy +=
             dir.y *
             this.acceleration *
+            slowMult *
             dt;
 
         const speed =
@@ -1479,7 +1664,10 @@ class Witness {
                 this.vy
             );
 
-        if (speed > this.maxSpeed) {
+        const effectiveMaxSpeed =
+            this.maxSpeed * slowMult;
+
+        if (speed > effectiveMaxSpeed) {
 
             const n =
                 normalize(
@@ -1488,10 +1676,10 @@ class Witness {
                 );
 
             this.vx =
-                n.x * this.maxSpeed;
+                n.x * effectiveMaxSpeed;
 
             this.vy =
-                n.y * this.maxSpeed;
+                n.y * effectiveMaxSpeed;
         }
 
         this.vx *=
@@ -1509,8 +1697,14 @@ class Witness {
         const oldX = this.x;
         const oldY = this.y;
 
+        /* Per-axis collision resolution: each axis is moved and
+           checked independently, so sliding along a wall keeps
+           the free axis moving instead of cancelling all motion
+           whenever any component of movement touches an obstacle.
+           This is what previously caused the "stuck" sensation
+           against certain obstacles. */
+
         this.x += this.vx * dt;
-        this.y += this.vy * dt;
 
         this.x =
             clamp(
@@ -1519,12 +1713,39 @@ class Witness {
                 canvas.width - this.radius
             );
 
+        let collidedX = false;
+
+        for (const obstacle of game.obstacles) {
+
+            if (
+                obstacle.collidesCircle(
+                    this.x,
+                    oldY,
+                    this.radius
+                )
+            ) {
+
+                collidedX = true;
+                break;
+            }
+        }
+
+        if (collidedX) {
+
+            this.x = oldX;
+            this.vx *= -0.2;
+        }
+
+        this.y += this.vy * dt;
+
         this.y =
             clamp(
                 this.y,
                 this.radius,
                 canvas.height - this.radius
             );
+
+        let collidedY = false;
 
         for (const obstacle of game.obstacles) {
 
@@ -1536,12 +1757,15 @@ class Witness {
                 )
             ) {
 
-                this.x = oldX;
-                this.y = oldY;
-
-                this.vx *= -0.2;
-                this.vy *= -0.2;
+                collidedY = true;
+                break;
             }
+        }
+
+        if (collidedY) {
+
+            this.y = oldY;
+            this.vy *= -0.2;
         }
 
         this.energy =
@@ -1557,6 +1781,12 @@ class Witness {
             Math.max(
                 0,
                 this.damageFlash - dt
+            );
+
+        this.feedFlash =
+            Math.max(
+                0,
+                this.feedFlash - dt
             );
 
         if (
@@ -1737,6 +1967,41 @@ class Witness {
         );
 
         ctx.stroke();
+
+        /* FEED RING — pulses outward briefly when THE MOUTH
+           consumes something, distinct from damage/dash cues */
+
+        if (this.feedFlash > 0) {
+
+            const feedProgress =
+                1 - (this.feedFlash / 260);
+
+            ctx.save();
+
+            ctx.globalAlpha =
+                clamp(1 - feedProgress, 0, 1) * 0.8;
+
+            ctx.shadowBlur = 22;
+            ctx.shadowColor = "#004d40";
+
+            ctx.strokeStyle = "#004d40";
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+
+            ctx.arc(
+                this.x,
+                this.y,
+                this.radius + 4 +
+                feedProgress * 30,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.stroke();
+
+            ctx.restore();
+        }
 
         /* BODY */
 
@@ -2013,6 +2278,11 @@ class Fragment {
         this.dead = false;
 
         this.alertUntil = 0;
+        this.hitFlash = 0;
+
+        this.hollowed = false;
+        this.hollowedTimer = 0;
+        this.hollowedSearchRadius = 260;
 
         this.spawnTimer =
             random(3000, 6000);
@@ -2024,6 +2294,19 @@ class Fragment {
     update(dt, game) {
 
         this.phase += dt * 0.003;
+
+        this.hitFlash =
+            Math.max(
+                0,
+                this.hitFlash - dt
+            );
+
+        if (this.hollowed) {
+
+            this.updateHollowed(dt, game);
+
+            return;
+        }
 
         if (this.clusterType === "ABERRATION") {
             return;
@@ -2220,11 +2503,234 @@ class Fragment {
         }
     }
 
+    updateHollowed(dt, game) {
+
+        this.hollowedTimer -= dt;
+
+        if (this.hollowedTimer <= 0) {
+
+            this.die(true);
+
+            return;
+        }
+
+        let target = null;
+        let bestDist =
+            this.hollowedSearchRadius;
+
+        for (const other of game.fragments) {
+
+            if (
+                other === this ||
+                other.dead ||
+                other.hollowed
+            ) {
+                continue;
+            }
+
+            const d =
+                distance(
+                    this.x,
+                    this.y,
+                    other.x,
+                    other.y
+                );
+
+            if (d < bestDist) {
+
+                bestDist = d;
+                target = other;
+            }
+        }
+
+        if (!target) {
+
+            this.vx *=
+                Math.pow(0.98, dt / 16.67);
+
+            this.vy *=
+                Math.pow(0.98, dt / 16.67);
+
+            this.x +=
+                this.vx * dt;
+
+            this.y +=
+                this.vy * dt;
+
+            this.x =
+                clamp(
+                    this.x,
+                    this.radius,
+                    canvas.width - this.radius
+                );
+
+            this.y =
+                clamp(
+                    this.y,
+                    this.radius,
+                    canvas.height - this.radius
+                );
+
+            return;
+        }
+
+        const dir =
+            normalize(
+                target.x - this.x,
+                target.y - this.y
+            );
+
+        this.vx +=
+            dir.x *
+            this.baseSpeed *
+            1.3 *
+            dt;
+
+        this.vy +=
+            dir.y *
+            this.baseSpeed *
+            1.3 *
+            dt;
+
+        this.x +=
+            this.vx * dt;
+
+        this.y +=
+            this.vy * dt;
+
+        this.x =
+            clamp(
+                this.x,
+                this.radius,
+                canvas.width - this.radius
+            );
+
+        this.y =
+            clamp(
+                this.y,
+                this.radius,
+                canvas.height - this.radius
+            );
+
+        const d =
+            distance(
+                this.x,
+                this.y,
+                target.x,
+                target.y
+            );
+
+        if (
+            d <
+            this.radius +
+            target.radius
+        ) {
+
+            target.maxHp += 15;
+
+            target.hp =
+                Math.min(
+                    target.maxHp,
+                    target.hp + 15
+                );
+
+            game.particles.burst(
+                this.x,
+                this.y,
+                14,
+                "normal",
+                1.1
+            );
+
+            this.dead = true;
+
+            return;
+        }
+
+        const witnessDist =
+            distance(
+                this.x,
+                this.y,
+                game.witness.x,
+                game.witness.y
+            );
+
+        if (
+            witnessDist <
+            this.radius +
+            game.witness.radius
+        ) {
+
+            game.witness.damage(1);
+        }
+    }
+
+    becomeHollowed() {
+
+        if (this.hollowed) {
+            return;
+        }
+
+        this.hollowed = true;
+        this.hollowedTimer = 6000;
+
+        this.clusterType = "FRAGMENT";
+        this.clusterSize = 1;
+
+        this.game.particles.ring(
+            this.x,
+            this.y,
+            20,
+            "normal"
+        );
+    }
+
+    renderHollowed(ctx) {
+
+        const flicker =
+            0.3 +
+            Math.abs(
+                Math.sin(this.phase * 1.5)
+            ) *
+            0.25;
+
+        ctx.save();
+
+        ctx.translate(
+            this.x,
+            this.y
+        );
+
+        ctx.globalAlpha = flicker;
+
+        ctx.strokeStyle = "#666666";
+        ctx.lineWidth = 1;
+
+        ctx.setLineDash([3, 4]);
+
+        ctx.beginPath();
+
+        ctx.moveTo(0, -this.radius);
+        ctx.lineTo(this.radius * 0.8, 0);
+        ctx.lineTo(0, this.radius);
+        ctx.lineTo(-this.radius * 0.8, 0);
+
+        ctx.closePath();
+
+        ctx.stroke();
+
+        ctx.setLineDash([]);
+
+        ctx.restore();
+    }
+
     damage(amount) {
 
         if (this.dead) {
             return;
         }
+
+        this.hitFlash = 120;
 
         this.hp -= amount;
 
@@ -2234,7 +2740,7 @@ class Fragment {
         }
     }
 
-    die() {
+    die(silent = false) {
 
         if (this.dead) {
             return;
@@ -2244,6 +2750,19 @@ class Fragment {
 
         const game =
             this.game;
+
+        if (silent) {
+
+            game.particles.burst(
+                this.x,
+                this.y,
+                10,
+                "death",
+                0.6
+            );
+
+            return;
+        }
 
         game.registerKill(
             this
@@ -2304,14 +2823,14 @@ class Fragment {
 
         /* HEAL */
 
-        if (Math.random() < 0.045) {
+        if (Math.random() < 0.08) {
 
             game.drops.push(
                 new Drop(
                     this.x + random(-10, 10),
                     this.y + random(-10, 10),
                     "heal",
-                    8
+                    15
                 )
             );
         }
@@ -2340,6 +2859,13 @@ class Fragment {
             return;
         }
 
+        if (this.hollowed) {
+
+            this.renderHollowed(ctx);
+
+            return;
+        }
+
         ctx.save();
 
         ctx.translate(
@@ -2365,11 +2891,19 @@ class Fragment {
             color = "#8b0000";
         }
 
-        ctx.shadowBlur = 8;
+        ctx.shadowBlur =
+            this.hitFlash > 0
+                ? 16
+                : 8;
+
         ctx.shadowColor = color;
 
         ctx.strokeStyle = color;
-        ctx.fillStyle = "#07070c";
+
+        ctx.fillStyle =
+            this.hitFlash > 0
+                ? "#ffffff"
+                : "#07070c";
 
         /* FRAGMENT */
 
@@ -2634,6 +3168,7 @@ class AberrationBoss {
             this.maxHp;
 
         this.dead = false;
+        this.hitFlash = 0;
 
         this.labelKey =
             "bossTitleAberration";
@@ -2650,6 +3185,12 @@ class AberrationBoss {
     update(dt, game) {
 
         this.phase += dt * 0.001;
+
+        this.hitFlash =
+            Math.max(
+                0,
+                this.hitFlash - dt
+            );
 
         const angle =
             angleTo(
@@ -2744,6 +3285,8 @@ class AberrationBoss {
         ) {
 
             game.witness.damage(16);
+
+            game.shake(8, 250);
         }
     }
 
@@ -2752,6 +3295,10 @@ class AberrationBoss {
         if (this.dead) {
             return;
         }
+
+        this.hitFlash = 140;
+
+        this.game.hitStop(2);
 
         this.hp -= amount;
 
@@ -2765,6 +3312,8 @@ class AberrationBoss {
             this.game.memory += 5;
 
             this.game.aberrationsKilled++;
+
+            this.game.shake(16, 450);
 
             this.game.showEvent(
                 t("aberrationDestroyed")
@@ -2816,7 +3365,9 @@ class AberrationBoss {
             "#8b0000";
 
         ctx.fillStyle =
-            "#050509";
+            this.hitFlash > 0
+                ? "#ffffff"
+                : "#050509";
 
         ctx.lineWidth = 2;
 
@@ -2946,6 +3497,7 @@ class HarbingerBoss {
             this.maxHp;
 
         this.dead = false;
+        this.hitFlash = 0;
 
         this.labelKey =
             "bossTitleHarbinger";
@@ -2970,6 +3522,12 @@ class HarbingerBoss {
     update(dt, game) {
 
         this.phase += dt * 0.0015;
+
+        this.hitFlash =
+            Math.max(
+                0,
+                this.hitFlash - dt
+            );
 
         this.chargeTimer -= dt;
 
@@ -3075,11 +3633,13 @@ class HarbingerBoss {
 
         if (
             d <
-            this.radius +
+            this.radius + 
             game.witness.radius
         ) {
 
             game.witness.damage(10);
+
+            game.shake(6, 220);
         }
     }
 
@@ -3088,6 +3648,10 @@ class HarbingerBoss {
         if (this.dead) {
             return;
         }
+
+        this.hitFlash = 140;
+
+        this.game.hitStop(2);
 
         this.hp -= amount;
 
@@ -3099,6 +3663,8 @@ class HarbingerBoss {
 
             this.game.echo += 800;
             this.game.memory += 2;
+
+            this.game.shake(14, 400);
 
             this.game.showEvent(
                 t("harbingerDestroyed")
@@ -3156,7 +3722,9 @@ class HarbingerBoss {
             "#004d40";
 
         ctx.fillStyle =
-            "#050509";
+            this.hitFlash > 0
+                ? "#ffffff"
+                : "#050509";
 
         ctx.lineWidth =
             charging ? 3 : 2;
@@ -3262,14 +3830,1923 @@ class HarbingerBoss {
 }
 
 /* =========================================================
-   CLUSTER SYSTEM
+   THE HOLLOW CHOIR (WAVE 15)
 ========================================================= */
 
+class HollowChoirBoss {
+
+    constructor(game) {
+
+        this.game = game;
+
+        this.x =
+            canvas.width / 2;
+
+        this.y = 100;
+
+        this.radius = 26;
+
+        this.maxHp = 1100;
+
+        this.hp =
+            this.maxHp;
+
+        this.dead = false;
+        this.hitFlash = 0;
+
+        this.labelKey =
+            "bossTitleHollowChoir";
+
+        this.arrivalKey =
+            "hollowChoirDescends";
+
+        this.preferredDistance = 250;
+
+        this.phase = 0;
+
+        this.pulseTimer =
+            random(2500, 3500);
+
+        this.pulseFlash = 0;
+    }
+
+    update(dt, game) {
+
+        this.phase += dt * 0.002;
+
+        this.hitFlash =
+            Math.max(
+                0,
+                this.hitFlash - dt
+            );
+
+        const d =
+            distance(
+                this.x,
+                this.y,
+                game.witness.x,
+                game.witness.y
+            );
+
+        const dir =
+            normalize(
+                game.witness.x - this.x,
+                game.witness.y - this.y
+            );
+
+        const diff =
+            d - this.preferredDistance;
+
+        const moveSpeed =
+            0.045;
+
+        this.x +=
+            dir.x *
+            clamp(diff, -1, 1) *
+            moveSpeed *
+            dt;
+
+        this.y +=
+            dir.y *
+            clamp(diff, -1, 1) *
+            moveSpeed *
+            dt;
+
+        this.x =
+            clamp(
+                this.x,
+                this.radius,
+                canvas.width - this.radius
+            );
+
+        this.y =
+            clamp(
+                this.y,
+                this.radius,
+                canvas.height - this.radius
+            );
+
+        this.pulseTimer -= dt;
+
+        this.pulseFlash =
+            Math.max(
+                0,
+                this.pulseFlash - dt
+            );
+
+        if (this.pulseTimer <= 0) {
+
+            this.pulseTimer =
+                random(3000, 4000);
+
+            this.pulseFlash = 400;
+
+            const alertUntil =
+                performance.now() + 2200;
+
+            for (const fragment of game.fragments) {
+
+                if (fragment.dead) {
+                    continue;
+                }
+
+                fragment.alertUntil =
+                    alertUntil;
+            }
+
+            game.particles.ring(
+                this.x,
+                this.y,
+                60,
+                "normal"
+            );
+
+            game.particles.ring(
+                this.x,
+                this.y,
+                110,
+                "normal"
+            );
+        }
+
+        if (
+            d <
+            this.radius + 
+            game.witness.radius 
+        ) {
+
+            game.witness.damage(6);
+
+            game.shake(4, 180);
+        }
+    }
+
+    damage(amount) {
+
+        if (this.dead) {
+            return;
+        }
+
+        this.hitFlash = 120;
+
+        this.game.hitStop(1);
+
+        this.hp -= amount;
+
+        if (this.hp <= 0) {
+
+            this.hp = 0;
+
+            this.dead = true;
+
+            this.game.echo += 1200;
+            this.game.memory += 3;
+
+            this.game.shake(12, 380);
+
+            this.game.showEvent(
+                t("hollowChoirDestroyed")
+            );
+
+            this.game.showPickup(
+                t("hollowChoirReward")
+            );
+
+            this.game.particles.burst(
+                this.x,
+                this.y,
+                55,
+                "death",
+                1.5
+            );
+
+            this.game.particles.ring(
+                this.x,
+                this.y,
+                70,
+                "normal"
+            );
+
+            this.game.boss = null;
+        }
+    }
+
+    render(ctx) {
+
+        if (this.dead) {
+            return;
+        }
+
+        ctx.save();
+
+        const flashAlpha =
+            clamp(
+                this.pulseFlash / 400,
+                0,
+                1
+            );
+
+        const pulse =
+            Math.sin(this.phase * 2) * 3;
+
+        ctx.shadowBlur =
+            18 + flashAlpha * 20;
+
+        ctx.shadowColor =
+            "#ffffcc";
+
+        ctx.translate(
+            this.x,
+            this.y
+        );
+
+        ctx.strokeStyle =
+            "#ffffcc";
+
+        ctx.fillStyle =
+            this.hitFlash > 0
+                ? "#ffffff"
+                : "#07070c";
+
+        ctx.lineWidth = 2;
+
+        /* ELONGATED VERTICAL BODY */
+
+        ctx.beginPath();
+
+        ctx.moveTo(0, -this.radius * 1.8 - pulse);
+
+        ctx.lineTo(this.radius * 0.7, -this.radius * 0.3);
+
+        ctx.lineTo(this.radius * 0.5, this.radius * 1.6);
+
+        ctx.lineTo(0, this.radius * 2 + pulse);
+
+        ctx.lineTo(-this.radius * 0.5, this.radius * 1.6);
+
+        ctx.lineTo(-this.radius * 0.7, -this.radius * 0.3);
+
+        ctx.closePath();
+
+        ctx.fill();
+        ctx.stroke();
+
+        /* CRACKS — brighten sharply during a pulse */
+
+        ctx.globalAlpha =
+            0.35 + flashAlpha * 0.65;
+
+        ctx.lineWidth = 1;
+
+        for (let i = 0; i < 5; i++) {
+
+            const yOffset =
+                -this.radius * 1.4 +
+                i * (this.radius * 0.7);
+
+            const wobble =
+                Math.sin(this.phase * 3 + i) * 4;
+
+            ctx.beginPath();
+
+            ctx.moveTo(-6 + wobble, yOffset);
+
+            ctx.lineTo(6 - wobble, yOffset + 8);
+
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+}
+
+/* =========================================================
+   THE DEEP MAW (WAVE 20)
+========================================================= */
+
+class DeepMawBoss {
+
+    constructor(game) {
+
+        this.game = game;
+
+        this.x =
+            canvas.width / 2;
+
+        this.y = 100;
+
+        this.radius = 70;
+
+        this.maxHp = 3200;
+
+        this.hp =
+            this.maxHp;
+
+        this.dead = false;
+        this.hitFlash = 0;
+
+        this.labelKey =
+            "bossTitleDeepMaw";
+
+        this.arrivalKey =
+            "deepMawDescends";
+
+        this.phase = 0;
+    }
+
+    update(dt, game) {
+
+        this.phase += dt * 0.0009;
+
+        this.hitFlash =
+            Math.max(
+                0,
+                this.hitFlash - dt
+            );
+
+        const dir =
+            normalize(
+                game.witness.x - this.x,
+                game.witness.y - this.y
+            );
+
+        this.x +=
+            dir.x * 0.024 * dt;
+
+        this.y +=
+            dir.y * 0.024 * dt;
+
+        this.x =
+            clamp(
+                this.x,
+                this.radius,
+                canvas.width - this.radius
+            );
+
+        this.y =
+            clamp(
+                this.y,
+                this.radius,
+                canvas.height - this.radius
+            );
+
+        const d =
+            distance(
+                this.x,
+                this.y,
+                game.witness.x,
+                game.witness.y
+            );
+
+        if (
+            d <
+            this.radius +
+            game.witness.radius
+        ) {
+
+            game.witness.damage(14);
+
+            game.shake(7, 220);
+        }
+    }
+
+    damage(amount) {
+
+        if (this.dead) {
+            return;
+        }
+
+        this.hitFlash = 140;
+
+        this.game.hitStop(2);
+
+        this.hp -= amount;
+
+        if (this.hp <= 0) {
+
+            this.hp = 0;
+
+            this.dead = true;
+
+            this.game.echo += 1800;
+            this.game.memory += 4;
+
+            this.game.shake(15, 420);
+
+            this.game.showEvent(
+                t("deepMawDestroyed")
+            );
+
+            this.game.showPickup(
+                t("deepMawReward")
+            );
+
+            this.game.particles.burst(
+                this.x,
+                this.y,
+                90,
+                "death",
+                2.2
+            );
+
+            this.game.particles.ring(
+                this.x,
+                this.y,
+                100,
+                "normal"
+            );
+
+            this.game.boss = null;
+        }
+    }
+
+    render(ctx) {
+
+        if (this.dead) {
+            return;
+        }
+
+        ctx.save();
+
+        const pulse =
+            Math.sin(this.phase * 2) * 6;
+
+        ctx.shadowBlur = 30;
+        ctx.shadowColor = "#4b0060";
+
+        ctx.translate(
+            this.x,
+            this.y
+        );
+
+        ctx.strokeStyle =
+            "#4b0060";
+
+        ctx.fillStyle =
+            this.hitFlash > 0
+                ? "#ffffff"
+                : "#050208";
+
+        ctx.lineWidth = 2;
+
+        /* LOW, WIDE MASS */
+
+        ctx.beginPath();
+
+        for (let i = 0; i < 16; i++) {
+
+            const angle =
+                i *
+                Math.PI *
+                2 / 16;
+
+            const wobble =
+                Math.sin(
+                    this.phase * 1.5 + i
+                ) * 6;
+
+            const radiusX =
+                this.radius * 1.25 +
+                wobble +
+                pulse;
+
+            const radiusY =
+                this.radius * 0.8 +
+                wobble * 0.5 +
+                pulse * 0.5;
+
+            const x =
+                Math.cos(angle) * radiusX;
+
+            const y =
+                Math.sin(angle) * radiusY;
+
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            }
+            else {
+                ctx.lineTo(x, y);
+            }
+        }
+
+        ctx.closePath();
+
+        ctx.fill();
+        ctx.stroke();
+
+        /* CENTRAL MAW OPENING */
+
+        ctx.fillStyle =
+            "#000000";
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            0,
+            0,
+            26 + pulse * 0.3,
+            16 + pulse * 0.2,
+            0,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        ctx.strokeStyle =
+            "#4b0060";
+
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            0,
+            0,
+            26 + pulse * 0.3,
+            16 + pulse * 0.2,
+            0,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.stroke();
+
+        ctx.restore();
+
+        /* HP BAR — deep maw always shows its damage state
+           given its high total pool, reusing the fragment
+           pattern for consistency */
+
+        if (
+            this.hp <
+            this.maxHp
+        ) {
+
+            const width = 90;
+
+            ctx.save();
+
+            ctx.fillStyle =
+                "#222222";
+
+            ctx.fillRect(
+                this.x - width / 2,
+                this.y - this.radius - 18,
+                width,
+                4
+            );
+
+            ctx.fillStyle =
+                "#4b0060";
+
+            ctx.fillRect(
+                this.x - width / 2,
+                this.y - this.radius - 18,
+                width *
+                clamp(
+                    this.hp / this.maxHp,
+                    0,
+                    1
+                ),
+                4
+            );
+
+                    ctx.restore();
+        }
+    }
+}
+
+/* =========================================================
+   THE WATCHER BENEATH (WAVE 25)
+========================================================= */
+
+class WatcherBeneathBoss {
+
+    constructor(game) {
+
+        this.game = game;
+
+        this.x =
+            canvas.width / 2;
+
+        this.y = 100;
+
+        this.radius = 20;
+
+        this.maxHp = 1700;
+
+        this.hp =
+            this.maxHp;
+
+        this.dead = false;
+        this.hitFlash = 0;
+
+        this.labelKey =
+            "bossTitleWatcher";
+
+        this.arrivalKey =
+            "watcherDescends";
+
+        this.preferredDistance = 230;
+
+        this.phase = 0;
+
+        this.wanderAngle =
+            random(0, Math.PI * 2);
+
+        this.zoneTimer =
+            random(2200, 3000);
+    }
+
+    update(dt, game) {
+
+        this.phase += dt * 0.0025;
+
+        this.hitFlash =
+            Math.max(
+                0,
+                this.hitFlash - dt
+            );
+
+        this.wanderAngle +=
+            random(-0.002, 0.002) * dt;
+
+        const d =
+            distance(
+                this.x,
+                this.y,
+                game.witness.x,
+                game.witness.y
+            );
+
+        const towardWitness =
+            normalize(
+                game.witness.x - this.x,
+                game.witness.y - this.y
+            );
+
+        const diff =
+            d - this.preferredDistance;
+
+        const radialSpeed =
+            0.06;
+
+        const wanderSpeed =
+            0.03;
+
+        this.x +=
+            towardWitness.x *
+            clamp(diff, -1, 1) *
+            radialSpeed *
+            dt;
+
+        this.y +=
+            towardWitness.y *
+            clamp(diff, -1, 1) *
+            radialSpeed *
+            dt;
+
+        this.x +=
+            Math.cos(this.wanderAngle) *
+            wanderSpeed *
+            dt;
+
+        this.y +=
+            Math.sin(this.wanderAngle) *
+            wanderSpeed *
+            dt;
+
+        this.x =
+            clamp(
+                this.x,
+                this.radius,
+                canvas.width - this.radius
+            );
+
+        this.y =
+            clamp(
+                this.y,
+                this.radius,
+                canvas.height - this.radius
+            );
+
+        this.zoneTimer -= dt;
+
+        if (this.zoneTimer <= 0) {
+
+            this.zoneTimer =
+                random(2400, 3200);
+
+            const predictionTime =
+                700;
+
+            const predictedX =
+                clamp(
+                    game.witness.x +
+                    game.witness.vx * predictionTime,
+                    40,
+                    canvas.width - 40
+                );
+
+            const predictedY =
+                clamp(
+                    game.witness.y +
+                    game.witness.vy * predictionTime,
+                    40,
+                    canvas.height - 40
+                );
+
+            game.dangerZones.push({
+                x: predictedX,
+                y: predictedY,
+                radius: 65,
+                life: 1600,
+                maxLife: 1600
+            });
+
+            game.particles.ring(
+                predictedX,
+                predictedY,
+                65,
+                "normal"
+            );
+        }
+
+        if (
+            d <
+            this.radius +
+            game.witness.radius
+        ) {
+
+            game.witness.damage(7);
+
+            game.shake(4, 180);
+        }
+    }
+
+    damage(amount) {
+
+        if (this.dead) {
+            return;
+        }
+
+        this.hitFlash = 120;
+
+        this.game.hitStop(1);
+
+        this.hp -= amount;
+
+        if (this.hp <= 0) {
+
+            this.hp = 0;
+
+            this.dead = true;
+
+            this.game.echo += 1500;
+            this.game.memory += 3;
+
+            this.game.shake(13, 400);
+
+            this.game.showEvent(
+                t("watcherDestroyed")
+            );
+
+            this.game.showPickup(
+                t("watcherReward")
+            );
+
+            this.game.particles.burst(
+                this.x,
+                this.y,
+                60,
+                "death",
+                1.6
+            );
+
+            this.game.particles.ring(
+                this.x,
+                this.y,
+                75,
+                "normal"
+            );
+
+            this.game.boss = null;
+        }
+    }
+
+    render(ctx) {
+
+        if (this.dead) {
+            return;
+        }
+
+        ctx.save();
+
+        const pulse =
+            Math.sin(this.phase * 2.5) * 2;
+
+        ctx.shadowBlur = 22;
+        ctx.shadowColor = "#3fd0ff";
+
+        ctx.translate(
+            this.x,
+            this.y
+        );
+
+        /* SMALL BODY */
+
+        ctx.strokeStyle =
+            "#3fd0ff";
+
+        ctx.fillStyle =
+            this.hitFlash > 0
+                ? "#ffffff"
+                : "#050509";
+
+        ctx.lineWidth = 1.5;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            this.radius * 0.55,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+        ctx.stroke();
+
+        /* OVERSIZED IRIS */
+
+        const aimAngle =
+            angleTo(
+                this.x,
+                this.y,
+                this.game.witness.x,
+                this.game.witness.y
+            );
+
+        ctx.fillStyle =
+            "#000000";
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            0,
+            0,
+            this.radius + pulse,
+            this.radius * 0.62 + pulse * 0.4,
+            aimAngle,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        ctx.strokeStyle =
+            "#3fd0ff";
+
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            0,
+            0,
+            this.radius + pulse,
+            this.radius * 0.62 + pulse * 0.4,
+            aimAngle,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.stroke();
+
+        ctx.fillStyle =
+            "#3fd0ff";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            4,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        ctx.restore();
+    }
+}
+
+/* =========================================================
+   THE UNRAVELING (WAVE 30)
+========================================================= */
+
+class UnravelingBoss {
+
+    constructor(game) {
+
+        this.game = game;
+
+        this.x =
+            canvas.width / 2;
+
+        this.y = 100;
+
+        this.radius = 34;
+
+        this.maxHp = 2000;
+
+        this.hp =
+            this.maxHp;
+
+        this.dead = false;
+        this.hitFlash = 0;
+
+        this.labelKey =
+            "bossTitleUnraveling";
+
+        this.arrivalKey =
+            "unravelingDescends";
+
+        this.phase = 0;
+
+        this.crossedThresholds =
+            new Set();
+    }
+
+    update(dt, game) {
+
+        this.phase += dt * 0.0018;
+
+        this.hitFlash =
+            Math.max(
+                0,
+                this.hitFlash - dt
+            );
+
+        const dir =
+            normalize(
+                game.witness.x - this.x,
+                game.witness.y - this.y
+            );
+
+        this.x +=
+            dir.x * 0.04 * dt;
+
+        this.y +=
+            dir.y * 0.04 * dt;
+
+        this.x =
+            clamp(
+                this.x,
+                this.radius,
+                canvas.width - this.radius
+            );
+
+        this.y =
+            clamp(
+                this.y,
+                this.radius,
+                canvas.height - this.radius
+            );
+
+        const d =
+            distance(
+                this.x,
+                this.y,
+                game.witness.x,
+                game.witness.y
+            );
+
+        if (
+            d <
+            this.radius +
+            game.witness.radius
+        ) {
+
+            game.witness.damage(9);
+
+            game.shake(5, 200);
+        }
+    }
+
+    checkThresholds(game) {
+
+        const ratio =
+            this.hp / this.maxHp;
+
+        const thresholds =
+            [0.75, 0.5, 0.25];
+
+        for (const threshold of thresholds) {
+
+            if (
+                ratio <= threshold &&
+                !this.crossedThresholds.has(threshold)
+            ) {
+
+                this.crossedThresholds.add(
+                    threshold
+                );
+
+                this.fragment(game);
+            }
+        }
+    }
+
+    fragment(game) {
+
+        game.showEvent(
+            t("unravelingFragments")
+        );
+
+        game.shake(10, 320);
+
+        game.particles.burst(
+            this.x,
+            this.y,
+            35,
+            "death",
+            1.4
+        );
+
+        for (let i = 0; i < 4; i++) {
+
+            const angle =
+                random(0, Math.PI * 2);
+
+            game.spawnFragmentNear(
+                this.x +
+                Math.cos(angle) * 55,
+                this.y +
+                Math.sin(angle) * 55,
+                2
+            );
+        }
+    }
+
+    damage(amount) {
+
+        if (this.dead) {
+            return;
+        }
+
+        this.hitFlash = 130;
+
+        this.game.hitStop(2);
+
+        this.hp -= amount;
+
+        if (this.hp <= 0) {
+
+            this.hp = 0;
+
+            this.dead = true;
+
+            this.game.echo += 1900;
+            this.game.memory += 4;
+
+            this.game.shake(15, 420);
+
+            this.game.showEvent(
+                t("unravelingDestroyed")
+            );
+
+            this.game.showPickup(
+                t("unravelingReward")
+            );
+
+            this.game.particles.burst(
+                this.x,
+                this.y,
+                85,
+                "death",
+                2
+            );
+
+            this.game.particles.ring(
+                this.x,
+                this.y,
+                90,
+                "normal"
+            );
+
+            this.game.boss = null;
+
+            return;
+        }
+
+        this.checkThresholds(
+            this.game
+        );
+    }
+
+    render(ctx) {
+
+        if (this.dead) {
+            return;
+        }
+
+        ctx.save();
+
+        const pulse =
+            Math.sin(this.phase * 2.2) * 4;
+
+        const crackLevel =
+            this.crossedThresholds.size;
+
+        ctx.shadowBlur = 26;
+        ctx.shadowColor = "#cc5500";
+
+        ctx.translate(
+            this.x,
+            this.y
+        );
+
+        ctx.strokeStyle =
+            "#cc5500";
+
+        ctx.fillStyle =
+            this.hitFlash > 0
+                ? "#ffffff"
+                : "#0a0604";
+
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+
+        for (let i = 0; i < 14; i++) {
+
+            const angle =
+                i *
+                Math.PI *
+                2 / 14;
+
+            const jitter =
+                crackLevel > 0
+                    ? random(-3, 3) *
+                      crackLevel
+                    : 0;
+
+            const radius =
+                this.radius +
+                Math.sin(
+                    this.phase * 2 + i
+                ) * 5 +
+                pulse +
+                jitter;
+
+            const x =
+                Math.cos(angle) * radius;
+
+            const y =
+                Math.sin(angle) * radius;
+
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            }
+            else {
+                ctx.lineTo(x, y);
+            }
+        }
+
+        ctx.closePath();
+
+        ctx.fill();
+        ctx.stroke();
+
+        /* ACCUMULATING CRACKS — one extra crack line per
+           threshold crossed, growing more chaotic each time */
+
+        ctx.globalAlpha = 0.8;
+        ctx.lineWidth = 1;
+
+        for (let i = 0; i < crackLevel * 3; i++) {
+
+            const angle =
+                (i * 2.4) +
+                this.phase * 0.5;
+
+            const innerR =
+                this.radius * 0.2;
+
+            const outerR =
+                this.radius *
+                (0.8 + (i % 3) * 0.15);
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                Math.cos(angle) * innerR,
+                Math.sin(angle) * innerR
+            );
+
+            ctx.lineTo(
+                Math.cos(angle) * outerR,
+                Math.sin(angle) * outerR
+            );
+
+            ctx.stroke();
+        }
+
+        ctx.restore();
+
+        /* HP BAR */
+
+        if (
+            this.hp <
+            this.maxHp
+        ) {
+
+            const width = 70;
+
+            ctx.save();
+
+            ctx.fillStyle =
+                "#222222";
+
+            ctx.fillRect(
+                this.x - width / 2,
+                this.y - this.radius - 14,
+                width,
+                3
+            );
+
+            ctx.fillStyle =
+                "#cc5500";
+
+            ctx.fillRect(
+                this.x - width / 2,
+                this.y - this.radius - 14,
+                width *
+                clamp(
+                    this.hp / this.maxHp,
+                    0,
+                    1
+                ),
+                3
+            );
+
+                    ctx.restore();
+        }
+    }
+}
+
+/* =========================================================
+   TAYATNA (WAVE 37 — FINAL BOSS)
+========================================================= */
+
+class TayatnaBoss {
+
+    constructor(game) {
+
+        this.game = game;
+
+        this.x =
+            canvas.width / 2;
+
+        this.y = 90;
+
+        this.radius = 66;
+
+        this.maxHp = 6000;
+
+        this.hp =
+            this.maxHp;
+
+        this.dead = false;
+        this.hitFlash = 0;
+
+        this.labelKey =
+            "bossTitleTayatna";
+
+        this.arrivalKey =
+            "tayatnaDescends";
+
+        this.phase = 0;
+
+        this.contactDamage = 18;
+
+        this.state = "approach";
+        this.stateTimer =
+            random(4000, 6000);
+
+        this.phase2 = false;
+
+        this.crossedThresholds =
+            new Set();
+
+        this.choirPulseUnlocked = false;
+        this.watcherZonesUnlocked = false;
+        this.deepPressUnlocked = false;
+        this.unravelFragUnlocked = false;
+
+        this.pulseTimer = 2000;
+        this.zoneTimer = 2500;
+    }
+
+    enterState(name, game) {
+
+        this.state = name;
+
+        if (name === "sorrow") {
+
+            this.stateTimer = 2500;
+
+            game.shake(8, 350);
+
+            const duration =
+                this.phase2
+                    ? 3200
+                    : 2500;
+
+            game.witness.slowUntil =
+                performance.now() +
+                duration;
+
+            game.witness.slowFactor =
+                this.phase2
+                    ? 0.35
+                    : 0.5;
+
+            game.showEvent(
+                t("tayatnaSorrow")
+            );
+
+            game.particles.ring(
+                this.x,
+                this.y,
+                150,
+                "death"
+            );
+
+            game.particles.ring(
+                this.x,
+                this.y,
+                90,
+                "death"
+            );
+        }
+
+        else if (name === "rest") {
+
+            this.stateTimer = 3000;
+
+            const count =
+                this.phase2
+                    ? 3
+                    : 2;
+
+            for (let i = 0; i < count; i++) {
+
+                const angle =
+                    random(0, Math.PI * 2);
+
+                game.spawnFragmentNear(
+                    this.x +
+                    Math.cos(angle) * 75,
+                    this.y +
+                    Math.sin(angle) * 75,
+                    2
+                );
+            }
+        }
+
+        else {
+
+            this.stateTimer =
+                random(4000, 6000);
+        }
+    }
+
+    update(dt, game) {
+
+        this.phase += dt * 0.0012;
+
+        this.hitFlash =
+            Math.max(
+                0,
+                this.hitFlash - dt
+            );
+
+        this.stateTimer -= dt;
+
+        if (this.state === "approach") {
+
+            const dir =
+                normalize(
+                    game.witness.x - this.x,
+                    game.witness.y - this.y
+                );
+
+            this.x +=
+                dir.x * 0.028 * dt;
+
+            this.y +=
+                dir.y * 0.028 * dt;
+
+            if (this.stateTimer <= 0) {
+
+                this.enterState(
+                    "sorrow",
+                    game
+                );
+            }
+        }
+
+        else if (this.state === "sorrow") {
+
+            if (this.stateTimer <= 0) {
+
+                this.enterState(
+                    "rest",
+                    game
+                );
+            }
+        }
+
+        else if (this.state === "rest") {
+
+            if (this.stateTimer <= 0) {
+
+                this.enterState(
+                    "approach",
+                    game
+                );
+            }
+        }
+
+        this.x =
+            clamp(
+                this.x,
+                this.radius,
+                canvas.width - this.radius
+            );
+
+        this.y =
+            clamp(
+                this.y,
+                this.radius,
+                canvas.height - this.radius
+            );
+
+        /* PROGRESSIVE PHASE 2 MECHANICS */
+
+        if (this.choirPulseUnlocked) {
+
+            this.pulseTimer -= dt;
+
+            if (this.pulseTimer <= 0) {
+
+                this.pulseTimer = 3200;
+
+                const alertUntil =
+                    performance.now() + 1800;
+
+                for (const fragment of game.fragments) {
+
+                    if (fragment.dead) {
+                        continue;
+                    }
+
+                    fragment.alertUntil =
+                        alertUntil;
+                }
+
+                game.particles.ring(
+                    this.x,
+                    this.y,
+                    50,
+                    "normal"
+                );
+            }
+        }
+
+        if (this.watcherZonesUnlocked) {
+
+            this.zoneTimer -= dt;
+
+            if (this.zoneTimer <= 0) {
+
+                this.zoneTimer = 3000;
+
+                const predictionTime = 700;
+
+                const predictedX =
+                    clamp(
+                        game.witness.x +
+                        game.witness.vx * predictionTime,
+                        40,
+                        canvas.width - 40
+                    );
+
+                const predictedY =
+                    clamp(
+                        game.witness.y +
+                        game.witness.vy * predictionTime,
+                        40,
+                        canvas.height - 40
+                    );
+
+                game.dangerZones.push({
+                    x: predictedX,
+                    y: predictedY,
+                    radius: 55,
+                    life: 1400,
+                    maxLife: 1400
+                });
+            }
+        }
+
+        const d =
+            distance(
+                this.x,
+                this.y,
+                game.witness.x,
+                game.witness.y
+            );
+
+        if (
+            d <
+            this.radius +
+            game.witness.radius
+        ) {
+
+            game.witness.damage(
+                this.contactDamage
+            );
+
+            game.shake(9, 260);
+        }
+    }
+
+    checkThresholds(game) {
+
+        const ratio =
+            this.hp / this.maxHp;
+
+        const steps = [
+            { at: 0.5, unlock: "choir" },
+            { at: 0.35, unlock: "watcher" },
+            { at: 0.2, unlock: "deep" },
+            { at: 0.08, unlock: "unravel" }
+        ];
+
+        for (const step of steps) {
+
+            if (
+                ratio <= step.at &&
+                !this.crossedThresholds.has(step.at)
+            ) {
+
+                this.crossedThresholds.add(
+                    step.at
+                );
+
+                this.unlockMechanic(
+                    step.unlock,
+                    game
+                );
+            }
+        }
+    }
+
+    unlockMechanic(name, game) {
+
+        if (name === "choir") {
+
+            this.phase2 = true;
+            this.choirPulseUnlocked = true;
+            this.pulseTimer = 1500;
+
+            game.shake(20, 550);
+
+            game.showEvent(
+                t("tayatnaDeepens")
+            );
+        }
+
+        else if (name === "watcher") {
+
+            this.watcherZonesUnlocked = true;
+            this.zoneTimer = 2000;
+
+            game.shake(12, 350);
+        }
+
+        else if (name === "deep") {
+
+            this.deepPressUnlocked = true;
+
+            this.radius += 8;
+            this.contactDamage += 4;
+
+            game.shake(12, 350);
+        }
+
+        else if (name === "unravel") {
+
+            this.unravelFragUnlocked = true;
+
+            game.shake(16, 420);
+
+            game.particles.burst(
+                this.x,
+                this.y,
+                45,
+                "death",
+                1.6
+            );
+
+            for (let i = 0; i < 5; i++) {
+
+                const angle =
+                    random(0, Math.PI * 2);
+
+                game.spawnFragmentNear(
+                    this.x +
+                    Math.cos(angle) * 70,
+                    this.y +
+                    Math.sin(angle) * 70,
+                    2
+                );
+            }
+        }
+    }
+
+    damage(amount) {
+
+        if (this.dead) {
+            return;
+        }
+
+        this.hitFlash = 150;
+
+        this.game.hitStop(2);
+
+        this.hp -= amount;
+
+        if (this.hp <= 0) {
+
+            this.hp = 0;
+
+            this.dead = true;
+
+            this.game.echo += 4000;
+            this.game.memory += 10;
+
+            this.game.shake(24, 700);
+
+            this.game.showEvent(
+                t("tayatnaDestroyed")
+            );
+
+            this.game.showPickup(
+                t("tayatnaReward")
+            );
+
+            this.game.particles.burst(
+                this.x,
+                this.y,
+                120,
+                "death",
+                2.4
+            );
+
+            this.game.particles.ring(
+                this.x,
+                this.y,
+                130,
+                "death"
+            );
+
+            this.game.boss = null;
+
+            this.game.triggerVictory();
+
+            return;
+        }
+
+        this.checkThresholds(
+            this.game
+        );
+    }
+
+    render(ctx) {
+
+        if (this.dead) {
+            return;
+        }
+
+        ctx.save();
+
+        const crackLevel =
+            this.crossedThresholds.size;
+
+        const pulse =
+            Math.sin(this.phase * 2) * 6;
+
+        const glowColor =
+            this.phase2
+                ? "#ff3030"
+                : "#8b0000";
+
+        ctx.shadowBlur =
+            30 + crackLevel * 8;
+
+        ctx.shadowColor =
+            glowColor;
+
+        ctx.translate(
+            this.x,
+            this.y
+        );
+
+        ctx.strokeStyle =
+            glowColor;
+
+        ctx.fillStyle =
+            this.hitFlash > 0
+                ? "#ffffff"
+                : "#040002";
+
+        ctx.lineWidth =
+            2 + crackLevel * 0.5;
+
+        ctx.beginPath();
+
+        for (let i = 0; i < 20; i++) {
+
+            const angle =
+                i *
+                Math.PI *
+                2 / 20;
+
+            const jitter =
+                crackLevel > 0
+                    ? random(-4, 4) * crackLevel
+                    : 0;
+
+            const radius =
+                this.radius +
+                Math.sin(
+                    this.phase * 2.5 + i
+                ) * 9 +
+                pulse +
+                jitter;
+
+            const x =
+                Math.cos(angle) * radius;
+
+            const y =
+                Math.sin(angle) * radius;
+
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            }
+            else {
+                ctx.lineTo(x, y);
+            }
+        }
+
+        ctx.closePath();
+
+        ctx.fill();
+        ctx.stroke();
+
+        /* DROOPING TENDRILS — sorrow, weight, always present,
+           multiplying and intensifying through phase 2 */
+
+        const tendrilCount =
+            6 + crackLevel * 2;
+
+        ctx.strokeStyle =
+            glowColor;
+
+        ctx.globalAlpha = 0.75;
+
+        for (let i = 0; i < tendrilCount; i++) {
+
+            const angle =
+                (Math.PI * 2 / tendrilCount) * i +
+                Math.sin(this.phase + i) * 0.15;
+
+            const sway =
+                Math.sin(this.phase * 1.5 + i * 2) * 10;
+
+            const length =
+                this.radius * 1.4 +
+                crackLevel * 6;
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                Math.cos(angle) * this.radius * 0.7,
+                Math.sin(angle) * this.radius * 0.7
+            );
+
+            ctx.quadraticCurveTo(
+                Math.cos(angle) * length * 0.6 + sway,
+                Math.sin(angle) * length * 0.6 + this.radius * 0.3,
+                Math.cos(angle) * length * 0.3 + sway * 1.5,
+                Math.sin(angle) * length + this.radius * 0.5
+            );
+
+            ctx.stroke();
+        }
+
+        ctx.globalAlpha = 1;
+
+        /* VOID CORE */
+
+        ctx.fillStyle =
+            "#000000";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            32,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        /* EYE */
+
+        ctx.fillStyle =
+            glowColor;
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            0,
+            0,
+            18 + pulse * 0.3,
+            8 + pulse * 0.2,
+            this.phase,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        ctx.restore();
+
+        /* HP BAR */
+
+        const width = 130;
+
+        ctx.save();
+
+        ctx.fillStyle =
+            "#222222";
+
+        ctx.fillRect(
+            this.x - width / 2,
+            this.y - this.radius - 22,
+            width,
+            5
+        );
+
+        ctx.fillStyle =
+            glowColor;
+
+        ctx.fillRect(
+            this.x - width / 2,
+            this.y - this.radius - 22,
+            width *
+            clamp(
+                this.hp / this.maxHp,
+                0,
+                1
+            ),
+            5
+        );
+
+        ctx.restore();
+    }
+}
+
+/* =========================================================
+   CLUSTER SYSTEM
+========================================================= */
 class ClusterSystem {
 
     constructor() {
 
         this.nextClusterId = 1;
+
+        this.phase = 0;
     }
 
     update(game) {
@@ -3382,6 +5859,8 @@ class ClusterSystem {
 
     render(ctx, game) {
 
+        this.phase += 0.05;
+
         const groups = {};
 
         for (const fragment of game.fragments) {
@@ -3449,15 +5928,25 @@ class ClusterSystem {
                 color = "#ffffcc";
             }
 
+            const pulse =
+                0.08 *
+                Math.sin(
+                    this.phase +
+                    group.length
+                );
+
             ctx.save();
 
             ctx.globalAlpha =
-                0.12;
+                0.32 + pulse;
 
             ctx.strokeStyle =
                 color;
 
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 2;
+
+            ctx.shadowBlur = 14;
+            ctx.shadowColor = color;
 
             ctx.beginPath();
 
@@ -3471,9 +5960,17 @@ class ClusterSystem {
 
             ctx.stroke();
 
+            ctx.globalAlpha =
+                0.06 + pulse * 0.3;
+
+            ctx.fillStyle =
+                color;
+
+            ctx.fill();
+
             ctx.restore();
 
-            if (group.length >= 6) {
+            if (group.length >= 3) {
 
                 ctx.save();
 
@@ -3481,10 +5978,13 @@ class ClusterSystem {
                     color;
 
                 ctx.globalAlpha =
-                    0.55;
+                    0.85;
+
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = color;
 
                 ctx.font =
-                    "9px Courier New";
+                    "bold 10px Courier New";
 
                 ctx.textAlign =
                     "center";
@@ -3494,7 +5994,9 @@ class ClusterSystem {
                         ? "ABERRATION"
                         : group.length >= 12
                             ? "MASS"
-                            : "NEST",
+                            : group.length >= 6
+                                ? "NEST"
+                                : "CLUSTER",
                     centerX,
                     centerY - radius - 5
                 );
@@ -3606,7 +6108,6 @@ class DefenseSystem {
                 this.thorn(game);
             }
         }
-
         if (
             input.isDown("e")
         ) {
@@ -3690,6 +6191,10 @@ class DefenseSystem {
 
             if (d < range) {
 
+                const wasConverging =
+                    fragment.clusterType === "NEST" ||
+                    fragment.clusterType === "MASS";
+
                 const dir =
                     normalize(
                         fragment.x -
@@ -3707,6 +6212,23 @@ class DefenseSystem {
 
                 fragment.y +=
                     dir.y * this.thornPush;
+
+                game.particles.burst(
+                    fragment.x,
+                    fragment.y,
+                    8,
+                    "energy",
+                    1.1
+                );
+
+                if (
+                    wasConverging &&
+                    !fragment.dead &&
+                    !fragment.hollowed
+                ) {
+
+                    fragment.becomeHollowed();
+                }
             }
         }
 
@@ -3728,10 +6250,19 @@ class DefenseSystem {
             }
         }
 
+        game.shake(6, 180);
+
         game.particles.ring(
             game.witness.x,
             game.witness.y,
             range,
+            "energy"
+        );
+
+        game.particles.ring(
+            game.witness.x,
+            game.witness.y,
+            range * 0.5,
             "energy"
         );
     }
@@ -3751,8 +6282,16 @@ class DefenseSystem {
             y: game.witness.y,
             radius: this.gravityRadius,
             life: this.gravityDuration,
-            maxLife: this.gravityDuration
+            maxLife: this.gravityDuration,
+            pulseTimer: 0
         });
+
+        game.particles.ring(
+            game.witness.x,
+            game.witness.y,
+            this.gravityRadius,
+            "energy"
+        );
 
         game.showEvent(
             t("gravityWombEvent")
@@ -3823,7 +6362,7 @@ class DefenseSystem {
         );
     }
 
-    mouth(game) {
+        mouth(game) {
 
         if (game.witness.energy < 25) {
             return;
@@ -3860,6 +6399,21 @@ class DefenseSystem {
 
                 game.echo +=
                     fragment.clusterSize * 2;
+
+                game.particles.burst(
+                    fragment.x,
+                    fragment.y,
+                    12,
+                    "energy",
+                    1.3
+                );
+
+                game.particles.ring(
+                    fragment.x,
+                    fragment.y,
+                    18,
+                    "energy"
+                );
             }
         }
 
@@ -3873,11 +6427,40 @@ class DefenseSystem {
                     game.witness.maxEnergy
                 );
 
+            game.witness.feedFlash = 260;
+
+            game.shake(
+                Math.min(4 + consumed * 2, 12),
+                180 + consumed * 40
+            );
+
+            game.hitStop(1);
+
             game.showEvent(
                 t("mouthEvent", { n: consumed })
             );
         }
+
+        else {
+
+            /* No valid target found: confirm the input was
+               registered instead of failing in total silence.
+               Faint grey pulse, no shake, no energy change —
+               clearly distinct from a successful feed. */
+
+            game.particles.ring(
+                game.witness.x,
+                game.witness.y,
+                42,
+                "death"
+            );
+
+            game.showEvent(
+                t("mouthEmpty")
+            );
+        }
     }
+
     theCall(game) {
 
         if (
@@ -3955,7 +6538,7 @@ class UpgradeSystem {
 
         this.game = game;
 
-                this.upgrades = [
+            this.upgrades = [
 
             {
                 id: "sharpEye",
@@ -4381,6 +6964,8 @@ class Game {
         this.state =
             "TITLE";
 
+        this.tayatnaDefeated = false;
+
         this.fragments = [];
         this.projectiles = [];
         this.drops = [];
@@ -4425,6 +7010,9 @@ class Game {
 
         this.maxFragments = 150;
 
+        this.mapTier = 1;
+        this.mapAccentColor = "25,25,112";
+
         this.echoMultiplier = 1;
 
         this.memoryDropChance =
@@ -4445,6 +7033,12 @@ class Game {
         this.eventTimer = 0;
         this.pickupTimer = 0;
 
+        this.shakeMagnitude = 0;
+        this.shakeDuration = 0;
+        this.shakeTimer = 0;
+
+        this.hitStopFrames = 0;
+
         this.menuCreatures = [];
 
         for (let i = 0; i < 25; i++) {
@@ -4461,45 +7055,101 @@ class Game {
         );
     }
 
-    createMap() {
+    createMap(tier = 1) {
 
-        this.obstacles = [
+        this.mapTier = tier;
 
-            new Obstacle(
-                300,
-                210,
-                120,
-                55
-            ),
+        if (tier === 1) {
 
-            new Obstacle(
-                770,
-                180,
-                120,
-                55
-            ),
+            this.mapAccentColor = "25,25,112";
 
-            new Obstacle(
-                480,
-                480,
-                240,
-                45
-            ),
+            this.obstacles = [
 
-            new Obstacle(
-                90,
-                430,
-                100,
-                60
-            ),
+                new Obstacle(300, 210, 120, 55),
+                new Obstacle(770, 180, 120, 55),
+                new Obstacle(480, 480, 240, 45),
+                new Obstacle(90, 430, 100, 60),
+                new Obstacle(970, 420, 100, 60)
+            ];
+        }
 
-            new Obstacle(
-                970,
-                420,
-                100,
-                60
-            )
-        ];
+        else if (tier === 2) {
+
+            this.mapAccentColor = "90,20,70";
+
+            this.obstacles = [
+
+                new Obstacle(200, 150, 110, 50),
+                new Obstacle(890, 150, 110, 50),
+                new Obstacle(550, 130, 100, 45),
+                new Obstacle(150, 510, 110, 55),
+                new Obstacle(940, 510, 110, 55),
+                new Obstacle(50, 300, 90, 160),
+                new Obstacle(1060, 300, 90, 160)
+            ];
+        }
+
+        else {
+
+            this.mapAccentColor = "139,0,0";
+
+            this.obstacles = [
+
+                new Obstacle(400, 190, 100, 50),
+                new Obstacle(700, 190, 100, 50),
+                new Obstacle(250, 300, 80, 140),
+                new Obstacle(870, 300, 80, 140),
+                new Obstacle(400, 540, 100, 50),
+                new Obstacle(700, 540, 100, 50),
+                new Obstacle(550, 110, 100, 40),
+                new Obstacle(550, 570, 100, 40)
+            ];
+        }
+
+        this.repositionWitnessIfStuck();
+    }
+
+    getMapTierForWave(wave) {
+
+        if (wave <= 15) {
+            return 1;
+        }
+
+        if (wave <= 30) {
+            return 2;
+        }
+
+        return 3;
+    }
+
+    repositionWitnessIfStuck() {
+
+        if (!this.witness) {
+            return;
+        }
+
+        for (const obstacle of this.obstacles) {
+
+            if (
+                obstacle.collidesCircle(
+                    this.witness.x,
+                    this.witness.y,
+                    this.witness.radius
+                )
+            ) {
+
+                this.witness.x =
+                    canvas.width / 2;
+
+                this.witness.y =
+                    canvas.height / 2;
+
+                this.witness.vx = 0;
+                this.witness.vy = 0;
+
+                return;
+            }
+        }
     }
 
     startNewRun() {
@@ -4537,6 +7187,8 @@ class Game {
 
         this.aberrationsKilled = 0;
 
+        this.tayatnaDefeated = false;
+
         this.waveTimer =
             this.waveDuration;
 
@@ -4557,6 +7209,8 @@ class Game {
         this.defense =
             new DefenseSystem(this);
 
+        this.createMap(1);
+
         titleScreen.classList.add(
             "hidden"
         );
@@ -4574,6 +7228,14 @@ class Game {
         );
 
         gameOverScreen.classList.add(
+            "hidden"
+        );
+
+        victoryScreen.classList.add(
+            "hidden"
+        );
+
+        creditsScreen.classList.add(
             "hidden"
         );
 
@@ -4623,6 +7285,53 @@ class Game {
 
         this.lastTime =
             performance.now();
+    }
+
+    triggerVictory() {
+
+        if (this.tayatnaDefeated) {
+            return;
+        }
+
+        this.tayatnaDefeated = true;
+
+        setTimeout(() => {
+
+            this.state =
+                "VICTORY";
+
+            document.getElementById(
+                "victoryFinalKills"
+            ).textContent =
+                this.kills +
+                this.totalSpawned -
+                this.fragments.length;
+
+            document.getElementById(
+                "victoryFinalEcho"
+            ).textContent =
+                this.echo;
+
+            document.getElementById(
+                "victoryFinalMemory"
+            ).textContent =
+                this.memory;
+
+            document.getElementById(
+                "victoryFinalCombo"
+            ).textContent =
+                `x${this.maxCombo}`;
+
+            document.getElementById(
+                "victoryFinalConvergence"
+            ).textContent =
+                this.largestConvergence;
+
+            victoryScreen.classList.remove(
+                "hidden"
+            );
+
+        }, 2400);
     }
 
     gameOver() {
@@ -4856,6 +7565,26 @@ class Game {
             1000;
     }
 
+    shake(magnitude, duration) {
+
+        if (magnitude < this.shakeMagnitude) {
+            return;
+        }
+
+        this.shakeMagnitude = magnitude;
+        this.shakeDuration = duration;
+        this.shakeTimer = duration;
+    }
+
+    hitStop(frames) {
+
+        this.hitStopFrames =
+            Math.max(
+                this.hitStopFrames,
+                frames
+            );
+    }
+
     update(dt) {
 
         if (
@@ -4920,6 +7649,23 @@ class Game {
             this.showEvent(
                 t("waveEvent", { n: this.wave })
             );
+
+            const targetMapTier =
+                this.getMapTierForWave(this.wave);
+
+            if (targetMapTier !== this.mapTier) {
+
+                this.createMap(targetMapTier);
+
+                const mapKey =
+                    targetMapTier === 2
+                        ? "mapTransitionTier2"
+                        : "mapTransitionTier3";
+
+                this.showEvent(
+                    t(mapKey)
+                );
+            }
 
             const bossKey =
                 BOSS_SEQUENCE[this.wave];
@@ -5060,7 +7806,7 @@ class Game {
             );
         }
 
-        /* GRAVITY */
+                /* GRAVITY */
 
         for (
             let i =
@@ -5075,6 +7821,9 @@ class Game {
             field.life -=
                 dt;
 
+            field.pulseTimer -=
+                dt;
+
             if (
                 field.life <= 0
             ) {
@@ -5085,6 +7834,20 @@ class Game {
                 );
 
                 continue;
+            }
+
+            if (
+                field.pulseTimer <= 0
+            ) {
+
+                field.pulseTimer = 550;
+
+                this.particles.ring(
+                    field.x,
+                    field.y,
+                    field.radius * 0.4,
+                    "energy"
+                );
             }
 
             for (
@@ -5116,6 +7879,12 @@ class Game {
 
                     fragment.vy *=
                         0.88;
+
+                    fragment.hitFlash =
+                        Math.max(
+                            fragment.hitFlash,
+                            60
+                        );
                 }
             }
         }
@@ -5259,7 +8028,45 @@ class Game {
             }
         }
 
+        if (
+            this.shakeTimer > 0
+        ) {
+
+            this.shakeTimer -=
+                dt;
+
+            if (
+                this.shakeTimer <= 0
+            ) {
+
+                this.shakeTimer = 0;
+                this.shakeMagnitude = 0;
+            }
+        }
+
         this.updateHUD();
+
+        /* Audio is a consequence of the real run state, not a
+           system tracked in parallel — same numbers the HUD
+           just rendered from, nothing gameplay-specific added
+           just for sound. */
+
+        if (audio) {
+
+            audio.update({
+                wave: this.wave,
+                enemyCount: this.fragments.length,
+                playerHealthRatio:
+                    this.witness.maxIntegrity > 0
+                        ? this.witness.integrity /
+                          this.witness.maxIntegrity
+                        : 1,
+                bossActive: !!this.boss,
+                tayatnaActive:
+                    !!this.boss &&
+                    this.boss.labelKey === "bossTitleTayatna"
+            });
+        }
     }
 
     updateHUD() {
@@ -5336,8 +8143,9 @@ class Game {
 
         const cooldowns = {
 
+            cooldownEye: "eye",
             cooldownQ: "q",
-            cooldownW: "w",
+            cooldownC: "c",
             cooldownE: "e",
             cooldownR: "r",
             cooldownF: "f"
@@ -5575,7 +8383,7 @@ class Game {
 
         gradient.addColorStop(
             0,
-            "rgba(25,25,112,0)"
+            `rgba(${this.mapAccentColor},0)`
         );
 
         gradient.addColorStop(
@@ -5716,6 +8524,30 @@ class Game {
             return;
         }
 
+        ctx.save();
+
+        if (this.shakeTimer > 0) {
+
+            const shakeFactor =
+                this.shakeTimer /
+                this.shakeDuration;
+
+            const offsetX =
+                random(-1, 1) *
+                this.shakeMagnitude *
+                shakeFactor;
+
+            const offsetY =
+                random(-1, 1) *
+                this.shakeMagnitude *
+                shakeFactor;
+
+            ctx.translate(
+                offsetX,
+                offsetY
+            );
+        }
+
         this.renderBackground();
 
         /* DANGER */
@@ -5763,13 +8595,30 @@ class Game {
             this.gravityFields
         ) {
 
+            const lifeRatio =
+                field.life /
+                field.maxLife;
+
+            const pulse =
+                0.06 *
+                Math.sin(
+                    performance.now() * 0.006
+                );
+
             ctx.save();
 
+            ctx.shadowBlur = 18;
+            ctx.shadowColor =
+                "#004d40";
+
             ctx.globalAlpha =
-                0.18;
+                (0.4 + pulse) *
+                clamp(lifeRatio * 2, 0, 1);
 
             ctx.strokeStyle =
                 "#004d40";
+
+            ctx.lineWidth = 2;
 
             ctx.beginPath();
 
@@ -5784,12 +8633,29 @@ class Game {
             ctx.stroke();
 
             ctx.globalAlpha =
-                0.05;
+                (0.16 + pulse) *
+                clamp(lifeRatio * 2, 0, 1);
 
             ctx.fillStyle =
                 "#004d40";
 
             ctx.fill();
+
+            ctx.globalAlpha =
+                0.25 *
+                clamp(lifeRatio * 2, 0, 1);
+
+            ctx.beginPath();
+
+            ctx.arc(
+                field.x,
+                field.y,
+                field.radius * 0.55,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.stroke();
 
             ctx.restore();
         }
@@ -5901,6 +8767,8 @@ class Game {
             canvas.width,
             canvas.height
         );
+
+        ctx.restore();
     }
 
     loop(timestamp) {
@@ -5919,12 +8787,22 @@ class Game {
             this.state !==
             "PAUSED" &&
             this.state !==
-            "UPGRADE"
+            "UPGRADE" &&
+            this.state !==
+            "VICTORY"
         ) {
 
-            this.update(
-                dt
-            );
+            if (this.hitStopFrames > 0) {
+
+                this.hitStopFrames--;
+            }
+
+            else {
+
+                this.update(
+                    dt
+                );
+            }
         }
 
         this.render();
@@ -5934,6 +8812,28 @@ class Game {
         );
     }
 }
+/* =========================================================
+   AUDIO
+========================================================= */
+
+/* AudioEngine/AudioAmbience are plain classes loaded via
+   <script> tags before this file (no bundler, no modules —
+   same architecture as every other system in this project).
+   Exposed on window explicitly so audio.debugAmbient() also
+   works when typed directly into the devtools console, since
+   top-level const/class declarations in a classic script are
+   not added to window on their own. */
+
+const audio =
+    typeof AudioEngine !== "undefined"
+        ? new AudioEngine()
+        : null;
+
+if (audio) {
+
+    window.audio = audio;
+}
+
 /* =========================================================
    INITIALIZE
 ========================================================= */
@@ -5948,6 +8848,16 @@ const game =
 startButton.addEventListener(
     "click",
     () => {
+
+        /* First guaranteed user gesture of the entire game.
+           Web Audio API refuses to start an AudioContext
+           outside a real gesture handler — this is the one
+           safe place to call it exactly once per session. */
+
+        if (audio) {
+
+            audio.enable();
+        }
 
         showTutorial();
     }
@@ -6023,6 +8933,32 @@ pauseRestartButton.addEventListener(
 retryButton.addEventListener(
     "click",
     () => {
+
+        game.startNewRun();
+    }
+);
+
+victoryContinueButton.addEventListener(
+    "click",
+    () => {
+
+        victoryScreen.classList.add(
+            "hidden"
+        );
+
+        creditsScreen.classList.remove(
+            "hidden"
+        );
+    }
+);
+
+creditsRestartButton.addEventListener(
+    "click",
+    () => {
+
+        creditsScreen.classList.add(
+            "hidden"
+        );
 
         game.startNewRun();
     }

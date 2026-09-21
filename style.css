@@ -823,3 +823,75 @@ button {
         font-size: 9px;
     }
 }
+/* =========================================================
+   VICTORY / CREDITS
+========================================================= */
+
+.victoryPanel {
+    border-color: #8b0000;
+    box-shadow:
+        0 0 60px rgba(139, 0, 0, 0.35),
+        inset 0 0 35px rgba(139, 0, 0, 0.12);
+}
+
+.victoryPanel .overlayHeader {
+    color: #ff3030;
+    text-shadow: 0 0 12px rgba(139, 0, 0, 0.6);
+}
+
+.victoryLine {
+    margin-top: 20px;
+    color: #cccccc;
+    font-size: 13px;
+    line-height: 1.7;
+    font-style: italic;
+}
+
+.creditsPanel {
+    text-align: center;
+    padding: 50px 40px;
+    border-color: #8b0000;
+}
+
+.creditsList p {
+    color: #999999;
+    font-size: 13px;
+    letter-spacing: 3px;
+    line-height: 2.4;
+}
+
+.creditsRole {
+    color: #444444;
+    font-size: 9px;
+    letter-spacing: 3px;
+}
+
+.creditsName {
+    color: #cccccc;
+    font-size: 13px;
+    letter-spacing: 2px;
+    margin-top: 2px;
+}
+
+.creditsSpaced {
+    margin-top: 10px;
+}
+
+.creditsFinal {
+    margin-top: 25px;
+    color: #ff3030;
+    font-size: 16px;
+    letter-spacing: 5px;
+    text-shadow: 0 0 10px rgba(139, 0, 0, 0.6);
+}
+
+.creditsStudio {
+    margin-top: 35px;
+    color: #444444;
+    font-size: 10px;
+    letter-spacing: 4px;
+}
+
+.creditsPanel .menuButton {
+    margin-top: 40px;
+}
