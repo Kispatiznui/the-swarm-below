@@ -354,6 +354,12 @@ const TEXT = {
         tayatnaDestroyed: "TAYATNA FALLS SILENT",
         tayatnaReward: "+4000 ECHO  +10 MEMORY",
 
+        victoryTitle: "THE DESCENT ENDS",
+        victoryLine:
+            "The Witness remains. Whatever waited below has gone still.",
+        victoryContinue: "CONTINUE",
+        creditsRestart: "BEGIN AGAIN",
+
         hollowChoirDescends: "THE HOLLOW CHOIR AWAKENS",
         hollowChoirDestroyed: "THE HOLLOW CHOIR IS SILENCED",
         hollowChoirReward: "+1200 ECHO  +3 MEMORY",
@@ -373,6 +379,7 @@ const TEXT = {
 
         chorusEvent: "CHORUS",
         mouthEvent: "THE MOUTH +{n}",
+        mouthEmpty: "NOTHING WEAK ENOUGH TO CONSUME",
         theCallEvent: "THE CALL",
         gatherEcho: "GATHER ECHO FOR AN UPGRADE",
 
@@ -524,6 +531,7 @@ const TEXT = {
         gravityWombEvent: "GRAVITY WOMB",
         chorusEvent: "CHORUS",
         mouthEvent: "THE MOUTH +{n}",
+        mouthEmpty: "NADA LO BASTANTE DÉBIL PARA CONSUMIR",
         theCallEvent: "THE CALL",
         gatherEcho: "REÚNE ECHO PARA UNA MEJORA",
 
@@ -653,6 +661,18 @@ const gameOverScreen =
 
 const retryButton =
     document.getElementById("retryButton");
+
+const victoryScreen =
+    document.getElementById("victoryScreen");
+
+const victoryContinueButton =
+    document.getElementById("victoryContinueButton");
+
+const creditsScreen =
+    document.getElementById("creditsScreen");
+
+const creditsRestartButton =
+    document.getElementById("creditsRestartButton");
 
 /* =========================================================
    HUD
@@ -893,6 +913,18 @@ function updateInterfaceLanguage() {
     document.getElementById("statConvergenceLabel").textContent =
         t("largestConvergence");
 
+    document.getElementById("victoryHeader").textContent =
+        t("victoryTitle");
+
+    document.getElementById("victoryNarrativeLine").textContent =
+        t("victoryLine");
+
+    victoryContinueButton.textContent =
+        t("victoryContinue");
+
+    creditsRestartButton.textContent =
+        t("creditsRestart");
+
     updateTutorial();
 }
 
@@ -970,6 +1002,30 @@ class InputSystem {
         window.addEventListener("mouseup", event => {
 
             if (event.button === 0) {
+                this.mouse.down = false;
+            }
+        });
+
+        /* CRITICAL FIX: without this, a keyup event missed during
+           a window focus loss (alt-tab, clicking outside the
+           canvas, OS-level focus steal) leaves that key "stuck"
+           as pressed forever, since InputSystem is a singleton
+           that persists across every retry for the whole browser
+           session. This clears all held keys the moment focus
+           is lost, preventing phantom input from accumulating
+           across multiple runs. */
+
+        window.addEventListener("blur", () => {
+
+            this.keys = {};
+            this.mouse.down = false;
+        });
+
+        document.addEventListener("visibilitychange", () => {
+
+            if (document.hidden) {
+
+                this.keys = {};
                 this.mouse.down = false;
             }
         });
@@ -1522,6 +1578,8 @@ class Witness {
 
         this.slowUntil = 0;
         this.slowFactor = 1;
+
+        this.feedFlash = 0;
     }
 
     reset() {
@@ -1548,23 +1606,39 @@ class Witness {
 
         this.slowUntil = 0;
         this.slowFactor = 1;
+
+        this.feedFlash = 0;
     }
 
     update(dt, game) {
 
+        const dashLocked =
+            performance.now() <
+            this.dashUntil;
+
         let dx = 0;
         let dy = 0;
 
-        if (game.input.isDown("w")) dy--;
-        if (game.input.isDown("s")) dy++;
-        if (game.input.isDown("a")) dx--;
-        if (game.input.isDown("d")) dx++;
+        /* While dashing, movement input is ignored entirely.
+           Direction is locked the instant the dash begins;
+           only the existing damping (applied further below)
+           is allowed to bleed off the dash velocity. This
+           makes the dash a committed, decisive displacement
+           instead of a redirectable slide. */
+
+        if (!dashLocked) {
+
+            if (game.input.isDown("w")) dy--;
+            if (game.input.isDown("s")) dy++;
+            if (game.input.isDown("a")) dx--;
+            if (game.input.isDown("d")) dx++;
+        }
 
         const dir =
             normalize(dx, dy);
 
         const slowActive =
-            performance.now() 
+            performance.now() <
             this.slowUntil;
 
         const slowMult =
@@ -1623,8 +1697,14 @@ class Witness {
         const oldX = this.x;
         const oldY = this.y;
 
+        /* Per-axis collision resolution: each axis is moved and
+           checked independently, so sliding along a wall keeps
+           the free axis moving instead of cancelling all motion
+           whenever any component of movement touches an obstacle.
+           This is what previously caused the "stuck" sensation
+           against certain obstacles. */
+
         this.x += this.vx * dt;
-        this.y += this.vy * dt;
 
         this.x =
             clamp(
@@ -1633,12 +1713,39 @@ class Witness {
                 canvas.width - this.radius
             );
 
+        let collidedX = false;
+
+        for (const obstacle of game.obstacles) {
+
+            if (
+                obstacle.collidesCircle(
+                    this.x,
+                    oldY,
+                    this.radius
+                )
+            ) {
+
+                collidedX = true;
+                break;
+            }
+        }
+
+        if (collidedX) {
+
+            this.x = oldX;
+            this.vx *= -0.2;
+        }
+
+        this.y += this.vy * dt;
+
         this.y =
             clamp(
                 this.y,
                 this.radius,
                 canvas.height - this.radius
             );
+
+        let collidedY = false;
 
         for (const obstacle of game.obstacles) {
 
@@ -1650,12 +1757,15 @@ class Witness {
                 )
             ) {
 
-                this.x = oldX;
-                this.y = oldY;
-
-                this.vx *= -0.2;
-                this.vy *= -0.2;
+                collidedY = true;
+                break;
             }
+        }
+
+        if (collidedY) {
+
+            this.y = oldY;
+            this.vy *= -0.2;
         }
 
         this.energy =
@@ -1671,6 +1781,12 @@ class Witness {
             Math.max(
                 0,
                 this.damageFlash - dt
+            );
+
+        this.feedFlash =
+            Math.max(
+                0,
+                this.feedFlash - dt
             );
 
         if (
@@ -1851,6 +1967,41 @@ class Witness {
         );
 
         ctx.stroke();
+
+        /* FEED RING — pulses outward briefly when THE MOUTH
+           consumes something, distinct from damage/dash cues */
+
+        if (this.feedFlash > 0) {
+
+            const feedProgress =
+                1 - (this.feedFlash / 260);
+
+            ctx.save();
+
+            ctx.globalAlpha =
+                clamp(1 - feedProgress, 0, 1) * 0.8;
+
+            ctx.shadowBlur = 22;
+            ctx.shadowColor = "#004d40";
+
+            ctx.strokeStyle = "#004d40";
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+
+            ctx.arc(
+                this.x,
+                this.y,
+                this.radius + 4 +
+                feedProgress * 30,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.stroke();
+
+            ctx.restore();
+        }
 
         /* BODY */
 
@@ -2129,6 +2280,10 @@ class Fragment {
         this.alertUntil = 0;
         this.hitFlash = 0;
 
+        this.hollowed = false;
+        this.hollowedTimer = 0;
+        this.hollowedSearchRadius = 260;
+
         this.spawnTimer =
             random(3000, 6000);
 
@@ -2145,6 +2300,13 @@ class Fragment {
                 0,
                 this.hitFlash - dt
             );
+
+        if (this.hollowed) {
+
+            this.updateHollowed(dt, game);
+
+            return;
+        }
 
         if (this.clusterType === "ABERRATION") {
             return;
@@ -2341,6 +2503,227 @@ class Fragment {
         }
     }
 
+    updateHollowed(dt, game) {
+
+        this.hollowedTimer -= dt;
+
+        if (this.hollowedTimer <= 0) {
+
+            this.die(true);
+
+            return;
+        }
+
+        let target = null;
+        let bestDist =
+            this.hollowedSearchRadius;
+
+        for (const other of game.fragments) {
+
+            if (
+                other === this ||
+                other.dead ||
+                other.hollowed
+            ) {
+                continue;
+            }
+
+            const d =
+                distance(
+                    this.x,
+                    this.y,
+                    other.x,
+                    other.y
+                );
+
+            if (d < bestDist) {
+
+                bestDist = d;
+                target = other;
+            }
+        }
+
+        if (!target) {
+
+            this.vx *=
+                Math.pow(0.98, dt / 16.67);
+
+            this.vy *=
+                Math.pow(0.98, dt / 16.67);
+
+            this.x +=
+                this.vx * dt;
+
+            this.y +=
+                this.vy * dt;
+
+            this.x =
+                clamp(
+                    this.x,
+                    this.radius,
+                    canvas.width - this.radius
+                );
+
+            this.y =
+                clamp(
+                    this.y,
+                    this.radius,
+                    canvas.height - this.radius
+                );
+
+            return;
+        }
+
+        const dir =
+            normalize(
+                target.x - this.x,
+                target.y - this.y
+            );
+
+        this.vx +=
+            dir.x *
+            this.baseSpeed *
+            1.3 *
+            dt;
+
+        this.vy +=
+            dir.y *
+            this.baseSpeed *
+            1.3 *
+            dt;
+
+        this.x +=
+            this.vx * dt;
+
+        this.y +=
+            this.vy * dt;
+
+        this.x =
+            clamp(
+                this.x,
+                this.radius,
+                canvas.width - this.radius
+            );
+
+        this.y =
+            clamp(
+                this.y,
+                this.radius,
+                canvas.height - this.radius
+            );
+
+        const d =
+            distance(
+                this.x,
+                this.y,
+                target.x,
+                target.y
+            );
+
+        if (
+            d <
+            this.radius +
+            target.radius
+        ) {
+
+            target.maxHp += 15;
+
+            target.hp =
+                Math.min(
+                    target.maxHp,
+                    target.hp + 15
+                );
+
+            game.particles.burst(
+                this.x,
+                this.y,
+                14,
+                "normal",
+                1.1
+            );
+
+            this.dead = true;
+
+            return;
+        }
+
+        const witnessDist =
+            distance(
+                this.x,
+                this.y,
+                game.witness.x,
+                game.witness.y
+            );
+
+        if (
+            witnessDist <
+            this.radius +
+            game.witness.radius
+        ) {
+
+            game.witness.damage(1);
+        }
+    }
+
+    becomeHollowed() {
+
+        if (this.hollowed) {
+            return;
+        }
+
+        this.hollowed = true;
+        this.hollowedTimer = 6000;
+
+        this.clusterType = "FRAGMENT";
+        this.clusterSize = 1;
+
+        this.game.particles.ring(
+            this.x,
+            this.y,
+            20,
+            "normal"
+        );
+    }
+
+    renderHollowed(ctx) {
+
+        const flicker =
+            0.3 +
+            Math.abs(
+                Math.sin(this.phase * 1.5)
+            ) *
+            0.25;
+
+        ctx.save();
+
+        ctx.translate(
+            this.x,
+            this.y
+        );
+
+        ctx.globalAlpha = flicker;
+
+        ctx.strokeStyle = "#666666";
+        ctx.lineWidth = 1;
+
+        ctx.setLineDash([3, 4]);
+
+        ctx.beginPath();
+
+        ctx.moveTo(0, -this.radius);
+        ctx.lineTo(this.radius * 0.8, 0);
+        ctx.lineTo(0, this.radius);
+        ctx.lineTo(-this.radius * 0.8, 0);
+
+        ctx.closePath();
+
+        ctx.stroke();
+
+        ctx.setLineDash([]);
+
+        ctx.restore();
+    }
+
     damage(amount) {
 
         if (this.dead) {
@@ -2357,7 +2740,7 @@ class Fragment {
         }
     }
 
-    die() {
+    die(silent = false) {
 
         if (this.dead) {
             return;
@@ -2367,6 +2750,19 @@ class Fragment {
 
         const game =
             this.game;
+
+        if (silent) {
+
+            game.particles.burst(
+                this.x,
+                this.y,
+                10,
+                "death",
+                0.6
+            );
+
+            return;
+        }
 
         game.registerKill(
             this
@@ -2460,6 +2856,13 @@ class Fragment {
     render(ctx) {
 
         if (this.dead) {
+            return;
+        }
+
+        if (this.hollowed) {
+
+            this.renderHollowed(ctx);
+
             return;
         }
 
@@ -3230,17 +3633,17 @@ class HarbingerBoss {
 
         if (
             d <
-            this.radius +
+            this.radius + 
             game.witness.radius
         ) {
 
             game.witness.damage(10);
-            
+
             game.shake(6, 220);
         }
     }
 
-        damage(amount) {
+    damage(amount) {
 
         if (this.dead) {
             return;
@@ -3568,8 +3971,8 @@ class HollowChoirBoss {
 
         if (
             d <
-            this.radius +
-            game.witness.radius
+            this.radius + 
+            game.witness.radius 
         ) {
 
             game.witness.damage(6);
@@ -5126,6 +5529,8 @@ class TayatnaBoss {
 
             this.game.boss = null;
 
+            this.game.triggerVictory();
+
             return;
         }
 
@@ -5340,6 +5745,8 @@ class ClusterSystem {
     constructor() {
 
         this.nextClusterId = 1;
+
+        this.phase = 0;
     }
 
     update(game) {
@@ -5452,6 +5859,8 @@ class ClusterSystem {
 
     render(ctx, game) {
 
+        this.phase += 0.05;
+
         const groups = {};
 
         for (const fragment of game.fragments) {
@@ -5519,15 +5928,25 @@ class ClusterSystem {
                 color = "#ffffcc";
             }
 
+            const pulse =
+                0.08 *
+                Math.sin(
+                    this.phase +
+                    group.length
+                );
+
             ctx.save();
 
             ctx.globalAlpha =
-                0.12;
+                0.32 + pulse;
 
             ctx.strokeStyle =
                 color;
 
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 2;
+
+            ctx.shadowBlur = 14;
+            ctx.shadowColor = color;
 
             ctx.beginPath();
 
@@ -5541,9 +5960,17 @@ class ClusterSystem {
 
             ctx.stroke();
 
+            ctx.globalAlpha =
+                0.06 + pulse * 0.3;
+
+            ctx.fillStyle =
+                color;
+
+            ctx.fill();
+
             ctx.restore();
 
-            if (group.length >= 6) {
+            if (group.length >= 3) {
 
                 ctx.save();
 
@@ -5551,10 +5978,13 @@ class ClusterSystem {
                     color;
 
                 ctx.globalAlpha =
-                    0.55;
+                    0.85;
+
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = color;
 
                 ctx.font =
-                    "9px Courier New";
+                    "bold 10px Courier New";
 
                 ctx.textAlign =
                     "center";
@@ -5564,7 +5994,9 @@ class ClusterSystem {
                         ? "ABERRATION"
                         : group.length >= 12
                             ? "MASS"
-                            : "NEST",
+                            : group.length >= 6
+                                ? "NEST"
+                                : "CLUSTER",
                     centerX,
                     centerY - radius - 5
                 );
@@ -5676,7 +6108,6 @@ class DefenseSystem {
                 this.thorn(game);
             }
         }
-
         if (
             input.isDown("e")
         ) {
@@ -5760,6 +6191,10 @@ class DefenseSystem {
 
             if (d < range) {
 
+                const wasConverging =
+                    fragment.clusterType === "NEST" ||
+                    fragment.clusterType === "MASS";
+
                 const dir =
                     normalize(
                         fragment.x -
@@ -5777,6 +6212,23 @@ class DefenseSystem {
 
                 fragment.y +=
                     dir.y * this.thornPush;
+
+                game.particles.burst(
+                    fragment.x,
+                    fragment.y,
+                    8,
+                    "energy",
+                    1.1
+                );
+
+                if (
+                    wasConverging &&
+                    !fragment.dead &&
+                    !fragment.hollowed
+                ) {
+
+                    fragment.becomeHollowed();
+                }
             }
         }
 
@@ -5798,10 +6250,19 @@ class DefenseSystem {
             }
         }
 
+        game.shake(6, 180);
+
         game.particles.ring(
             game.witness.x,
             game.witness.y,
             range,
+            "energy"
+        );
+
+        game.particles.ring(
+            game.witness.x,
+            game.witness.y,
+            range * 0.5,
             "energy"
         );
     }
@@ -5821,8 +6282,16 @@ class DefenseSystem {
             y: game.witness.y,
             radius: this.gravityRadius,
             life: this.gravityDuration,
-            maxLife: this.gravityDuration
+            maxLife: this.gravityDuration,
+            pulseTimer: 0
         });
+
+        game.particles.ring(
+            game.witness.x,
+            game.witness.y,
+            this.gravityRadius,
+            "energy"
+        );
 
         game.showEvent(
             t("gravityWombEvent")
@@ -5893,7 +6362,7 @@ class DefenseSystem {
         );
     }
 
-    mouth(game) {
+        mouth(game) {
 
         if (game.witness.energy < 25) {
             return;
@@ -5930,6 +6399,21 @@ class DefenseSystem {
 
                 game.echo +=
                     fragment.clusterSize * 2;
+
+                game.particles.burst(
+                    fragment.x,
+                    fragment.y,
+                    12,
+                    "energy",
+                    1.3
+                );
+
+                game.particles.ring(
+                    fragment.x,
+                    fragment.y,
+                    18,
+                    "energy"
+                );
             }
         }
 
@@ -5943,11 +6427,40 @@ class DefenseSystem {
                     game.witness.maxEnergy
                 );
 
+            game.witness.feedFlash = 260;
+
+            game.shake(
+                Math.min(4 + consumed * 2, 12),
+                180 + consumed * 40
+            );
+
+            game.hitStop(1);
+
             game.showEvent(
                 t("mouthEvent", { n: consumed })
             );
         }
+
+        else {
+
+            /* No valid target found: confirm the input was
+               registered instead of failing in total silence.
+               Faint grey pulse, no shake, no energy change —
+               clearly distinct from a successful feed. */
+
+            game.particles.ring(
+                game.witness.x,
+                game.witness.y,
+                42,
+                "death"
+            );
+
+            game.showEvent(
+                t("mouthEmpty")
+            );
+        }
     }
+
     theCall(game) {
 
         if (
@@ -6025,7 +6538,7 @@ class UpgradeSystem {
 
         this.game = game;
 
-                this.upgrades = [
+            this.upgrades = [
 
             {
                 id: "sharpEye",
@@ -6451,6 +6964,8 @@ class Game {
         this.state =
             "TITLE";
 
+        this.tayatnaDefeated = false;
+
         this.fragments = [];
         this.projectiles = [];
         this.drops = [];
@@ -6672,6 +7187,8 @@ class Game {
 
         this.aberrationsKilled = 0;
 
+        this.tayatnaDefeated = false;
+
         this.waveTimer =
             this.waveDuration;
 
@@ -6711,6 +7228,14 @@ class Game {
         );
 
         gameOverScreen.classList.add(
+            "hidden"
+        );
+
+        victoryScreen.classList.add(
+            "hidden"
+        );
+
+        creditsScreen.classList.add(
             "hidden"
         );
 
@@ -6760,6 +7285,53 @@ class Game {
 
         this.lastTime =
             performance.now();
+    }
+
+    triggerVictory() {
+
+        if (this.tayatnaDefeated) {
+            return;
+        }
+
+        this.tayatnaDefeated = true;
+
+        setTimeout(() => {
+
+            this.state =
+                "VICTORY";
+
+            document.getElementById(
+                "victoryFinalKills"
+            ).textContent =
+                this.kills +
+                this.totalSpawned -
+                this.fragments.length;
+
+            document.getElementById(
+                "victoryFinalEcho"
+            ).textContent =
+                this.echo;
+
+            document.getElementById(
+                "victoryFinalMemory"
+            ).textContent =
+                this.memory;
+
+            document.getElementById(
+                "victoryFinalCombo"
+            ).textContent =
+                `x${this.maxCombo}`;
+
+            document.getElementById(
+                "victoryFinalConvergence"
+            ).textContent =
+                this.largestConvergence;
+
+            victoryScreen.classList.remove(
+                "hidden"
+            );
+
+        }, 2400);
     }
 
     gameOver() {
@@ -7234,7 +7806,7 @@ class Game {
             );
         }
 
-        /* GRAVITY */
+                /* GRAVITY */
 
         for (
             let i =
@@ -7249,6 +7821,9 @@ class Game {
             field.life -=
                 dt;
 
+            field.pulseTimer -=
+                dt;
+
             if (
                 field.life <= 0
             ) {
@@ -7259,6 +7834,20 @@ class Game {
                 );
 
                 continue;
+            }
+
+            if (
+                field.pulseTimer <= 0
+            ) {
+
+                field.pulseTimer = 550;
+
+                this.particles.ring(
+                    field.x,
+                    field.y,
+                    field.radius * 0.4,
+                    "energy"
+                );
             }
 
             for (
@@ -7290,6 +7879,12 @@ class Game {
 
                     fragment.vy *=
                         0.88;
+
+                    fragment.hitFlash =
+                        Math.max(
+                            fragment.hitFlash,
+                            60
+                        );
                 }
             }
         }
@@ -7450,6 +8045,28 @@ class Game {
         }
 
         this.updateHUD();
+
+        /* Audio is a consequence of the real run state, not a
+           system tracked in parallel — same numbers the HUD
+           just rendered from, nothing gameplay-specific added
+           just for sound. */
+
+        if (audio) {
+
+            audio.update({
+                wave: this.wave,
+                enemyCount: this.fragments.length,
+                playerHealthRatio:
+                    this.witness.maxIntegrity > 0
+                        ? this.witness.integrity /
+                          this.witness.maxIntegrity
+                        : 1,
+                bossActive: !!this.boss,
+                tayatnaActive:
+                    !!this.boss &&
+                    this.boss.labelKey === "bossTitleTayatna"
+            });
+        }
     }
 
     updateHUD() {
@@ -7526,8 +8143,9 @@ class Game {
 
         const cooldowns = {
 
+            cooldownEye: "eye",
             cooldownQ: "q",
-            cooldownW: "w",
+            cooldownC: "c",
             cooldownE: "e",
             cooldownR: "r",
             cooldownF: "f"
@@ -7977,13 +8595,30 @@ class Game {
             this.gravityFields
         ) {
 
+            const lifeRatio =
+                field.life /
+                field.maxLife;
+
+            const pulse =
+                0.06 *
+                Math.sin(
+                    performance.now() * 0.006
+                );
+
             ctx.save();
 
+            ctx.shadowBlur = 18;
+            ctx.shadowColor =
+                "#004d40";
+
             ctx.globalAlpha =
-                0.18;
+                (0.4 + pulse) *
+                clamp(lifeRatio * 2, 0, 1);
 
             ctx.strokeStyle =
                 "#004d40";
+
+            ctx.lineWidth = 2;
 
             ctx.beginPath();
 
@@ -7998,12 +8633,29 @@ class Game {
             ctx.stroke();
 
             ctx.globalAlpha =
-                0.05;
+                (0.16 + pulse) *
+                clamp(lifeRatio * 2, 0, 1);
 
             ctx.fillStyle =
                 "#004d40";
 
             ctx.fill();
+
+            ctx.globalAlpha =
+                0.25 *
+                clamp(lifeRatio * 2, 0, 1);
+
+            ctx.beginPath();
+
+            ctx.arc(
+                field.x,
+                field.y,
+                field.radius * 0.55,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.stroke();
 
             ctx.restore();
         }
@@ -8135,7 +8787,9 @@ class Game {
             this.state !==
             "PAUSED" &&
             this.state !==
-            "UPGRADE"
+            "UPGRADE" &&
+            this.state !==
+            "VICTORY"
         ) {
 
             if (this.hitStopFrames > 0) {
@@ -8159,6 +8813,28 @@ class Game {
     }
 }
 /* =========================================================
+   AUDIO
+========================================================= */
+
+/* AudioEngine/AudioAmbience are plain classes loaded via
+   <script> tags before this file (no bundler, no modules —
+   same architecture as every other system in this project).
+   Exposed on window explicitly so audio.debugAmbient() also
+   works when typed directly into the devtools console, since
+   top-level const/class declarations in a classic script are
+   not added to window on their own. */
+
+const audio =
+    typeof AudioEngine !== "undefined"
+        ? new AudioEngine()
+        : null;
+
+if (audio) {
+
+    window.audio = audio;
+}
+
+/* =========================================================
    INITIALIZE
 ========================================================= */
 
@@ -8172,6 +8848,16 @@ const game =
 startButton.addEventListener(
     "click",
     () => {
+
+        /* First guaranteed user gesture of the entire game.
+           Web Audio API refuses to start an AudioContext
+           outside a real gesture handler — this is the one
+           safe place to call it exactly once per session. */
+
+        if (audio) {
+
+            audio.enable();
+        }
 
         showTutorial();
     }
@@ -8247,6 +8933,32 @@ pauseRestartButton.addEventListener(
 retryButton.addEventListener(
     "click",
     () => {
+
+        game.startNewRun();
+    }
+);
+
+victoryContinueButton.addEventListener(
+    "click",
+    () => {
+
+        victoryScreen.classList.add(
+            "hidden"
+        );
+
+        creditsScreen.classList.remove(
+            "hidden"
+        );
+    }
+);
+
+creditsRestartButton.addEventListener(
+    "click",
+    () => {
+
+        creditsScreen.classList.add(
+            "hidden"
+        );
 
         game.startNewRun();
     }

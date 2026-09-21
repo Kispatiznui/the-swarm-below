@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>THE SWARM BELOW</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -51,6 +51,9 @@
             </div>
         </div>
     </section>
+    <div id="rotateDeviceOverlay">
+        <p>ROTATE DEVICE</p>
+    </div>
 
     <!-- TUTORIAL -->
     <section id="tutorialScreen" class="screen hidden">
@@ -321,8 +324,100 @@
 
     </section>
 
+    <!-- VICTORY -->
+    <section id="victoryScreen" class="overlay hidden">
+
+        <div class="overlayPanel victoryPanel">
+
+            <div class="overlayHeader" id="victoryHeader">THE DESCENT ENDS</div>
+
+            <p class="victoryLine" id="victoryNarrativeLine">
+                The Witness remains. Whatever waited below has gone still.
+            </p>
+
+            <div class="stats">
+
+                <div>
+                    <span id="statKillsLabel">KILLS</span>
+                    <strong id="victoryFinalKills">0</strong>
+                </div>
+
+                <div>
+                    <span id="statEchoLabel">ECHO</span>
+                    <strong id="victoryFinalEcho">0</strong>
+                </div>
+
+                <div>
+                    <span id="statMemoryLabel">MEMORY</span>
+                    <strong id="victoryFinalMemory">0</strong>
+                </div>
+
+                <div>
+                    <span id="statComboLabel">MAX COMBO</span>
+                    <strong id="victoryFinalCombo">x1</strong>
+                </div>
+
+                <div>
+                    <span id="statConvergenceLabel">LARGEST CONVERGENCE</span>
+                    <strong id="victoryFinalConvergence">0</strong>
+                </div>
+
+            </div>
+
+            <button id="victoryContinueButton" class="menuButton">
+                CONTINUE
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- CREDITS -->
+    <section id="creditsScreen" class="overlay hidden">
+
+        <div class="overlayPanel creditsPanel">
+
+            <div class="creditsList">
+
+                <p class="creditsRole">CREATED BY</p>
+                <p class="creditsName">KISPAT DREAMS INTERACTIVE</p>
+
+                <p class="creditsRole creditsSpaced">DEVELOPMENT</p>
+                <p class="creditsName" id="creditsDevName">KISPATIZNUI &middot; CLAUDE</p>
+
+                <p class="creditsRole creditsSpaced">SOUND DESIGN</p>
+                <p class="creditsName">&mdash;</p>
+
+                <p class="creditsRole creditsSpaced">TRANSLATION</p>
+                <p class="creditsName">&mdash;</p>
+
+                <p class="creditsRole creditsSpaced">LIBRARIES &amp; TOOLS</p>
+                <p class="creditsName">&mdash;</p>
+
+                <p class="creditsSpaced">THE WITNESS</p>
+                <p>THE SWARM</p>
+                <p class="creditsSpaced">THE HARBINGER &middot; ABERRATION</p>
+                <p>THE HOLLOW CHOIR &middot; THE DEEP MAW</p>
+                <p>THE WATCHER BENEATH &middot; THE UNRAVELING</p>
+                <p class="creditsFinal">TAYATNA</p>
+
+            </div>
+
+            <button id="creditsRestartButton" class="menuButton">
+                BEGIN AGAIN
+            </button>
+
+        </div>
+
+    </section>
+
 </div>
 
+<script src="input/DeviceDetector.js"></script>
+<script src="input/TouchControls.js"></script>
+<script src="audio/AudioEngine.js"></script>
+<script src="audio/AudioAmbience.js"></script>
+<script src="debug/DebugMode.js"></script>
 <script src="game.js"></script>
 
 </body>
