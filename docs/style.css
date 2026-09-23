@@ -1,3 +1,7 @@
+/* =========================================================
+   RESET
+========================================================= */
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -8,6 +12,7 @@ html,
 body {
     width: 100%;
     height: 100%;
+    height: 100dvh;
 }
 
 body {
@@ -16,21 +21,39 @@ body {
     color: #ffffcc;
     font-family: "Courier New", monospace;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 button {
     font-family: inherit;
 }
 
+/* =========================================================
+   #gameWrapper — VERSIÓN DEFINITIVA UNIFICADA
+   Combina:
+   - aspect-ratio (evita deformación del canvas)
+   - dvh/svh/vh con fallback progresivo (altura real en móvil)
+   - min() para no salirse en ninguna orientación
+========================================================= */
+
 #gameWrapper {
     position: relative;
-    width: 1200px;
-    height: 720px;
+    aspect-ratio: 1200 / 720;
+    width: min(1200px, 100vw, 100dvh * (1200 / 720));
+    height: auto;
     max-width: 100vw;
     max-height: 100vh;
-    margin: auto;
+    max-height: 100svh;
+    max-height: 100dvh;
     overflow: hidden;
     background: #191970;
+    touch-action: none;
 }
 
 #gameCanvas {
@@ -38,8 +61,10 @@ button {
     inset: 0;
     width: 100%;
     height: 100%;
+    display: block;
     background: #191970;
     cursor: crosshair;
+    touch-action: none;
 }
 
 /* =========================
@@ -370,6 +395,10 @@ button {
     display: flex;
     align-items: flex-start;
     gap: 12px;
+
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
 }
 
 .resourceBlock {
@@ -536,6 +565,8 @@ button {
     padding: 7px;
 
     text-align: center;
+
+    pointer-events: auto;
 }
 
 .abilityKey {
@@ -580,8 +611,8 @@ button {
 .overlay {
     position: absolute;
     inset: 0;
-    z-index: 40;              /* sube encima del HUD (10) y otros elementos */
-    pointer-events: auto;     /* habilita interacción */
+    z-index: 40;
+    pointer-events: auto;
 
     display: flex;
     justify-content: center;
@@ -657,12 +688,14 @@ button {
     margin-top: 5px;
     font-size: 15px;
 }
+
 #upgradeScreen {
     position: absolute;
     inset: 0;
-    z-index: 40;        /* más alto que el HUD (10) y otros overlays (30) */
-    pointer-events: auto; /* habilita clics dentro */
+    z-index: 40;
+    pointer-events: auto;
 }
+
 /* =========================
    UPGRADES
 ========================= */
@@ -730,9 +763,277 @@ button {
     color: #8b0000;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+/* =========================================================
+   VICTORY / CREDITS
+========================================================= */
+
+.victoryPanel {
+    border-color: #8b0000;
+    box-shadow:
+        0 0 60px rgba(139, 0, 0, 0.35),
+        inset 0 0 35px rgba(139, 0, 0, 0.12);
+}
+
+.victoryPanel .overlayHeader {
+    color: #ff3030;
+    text-shadow: 0 0 12px rgba(139, 0, 0, 0.6);
+}
+
+.victoryLine {
+    margin-top: 20px;
+    color: #cccccc;
+    font-size: 13px;
+    line-height: 1.7;
+    font-style: italic;
+}
+
+.creditsPanel {
+    text-align: center;
+    padding: 50px 40px;
+    border-color: #8b0000;
+}
+
+.creditsList p {
+    color: #999999;
+    font-size: 13px;
+    letter-spacing: 3px;
+    line-height: 2.4;
+}
+
+.creditsRole {
+    color: #444444;
+    font-size: 9px;
+    letter-spacing: 3px;
+}
+
+.creditsName {
+    color: #cccccc;
+    font-size: 13px;
+    letter-spacing: 2px;
+    margin-top: 2px;
+}
+
+.creditsSpaced {
+    margin-top: 10px;
+}
+
+.creditsFinal {
+    margin-top: 25px;
+    color: #ff3030;
+    font-size: 16px;
+    letter-spacing: 5px;
+    text-shadow: 0 0 10px rgba(139, 0, 0, 0.6);
+}
+
+.creditsStudio {
+    margin-top: 35px;
+    color: #444444;
+    font-size: 10px;
+    letter-spacing: 4px;
+}
+
+.creditsPanel .menuButton {
+    margin-top: 40px;
+}
+
+/* =========================================================
+   MOBILE — TOUCH CONTROLS
+========================================================= */
+
+.mobileOnly {
+    display: none;
+}
+
+body[data-input-mode="mobile"] .mobileOnly {
+    display: block;
+}
+
+.touchPad {
+    position: absolute;
+    bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 204, 0.25);
+    background: rgba(4, 4, 12, 0.55);
+    touch-action: none;
+    z-index: 50;
+}
+
+#touchJoystickBase {
+    left: calc(24px + env(safe-area-inset-left, 0px));
+}
+
+#touchAimBase {
+    right: calc(24px + env(safe-area-inset-right, 0px));
+}
+
+.touchPadKnob {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    margin: -22px 0 0 -22px;
+    border-radius: 50%;
+    background: rgba(255, 255, 204, 0.18);
+    border: 1px solid rgba(255, 255, 204, 0.4);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.touchAimKnob {
+    background: rgba(139, 0, 0, 0.35);
+    border-color: rgba(139, 0, 0, 0.6);
+}
+
+body[data-input-mode="mobile"] .abilityCard.touchTappable {
+    min-width: 54px;
+    min-height: 54px;
+    touch-action: none;
+}
+
+body[data-input-mode="mobile"] #bottomHUD {
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+}
+
+body[data-input-mode="mobile"] .pauseButton {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* =========================================================
+   ROTATE DEVICE OVERLAY
+========================================================= */
+
+#rotateDeviceOverlay {
+    display: none;
+    padding: env(safe-area-inset-top, 0px)
+             env(safe-area-inset-right, 0px)
+             env(safe-area-inset-bottom, 0px)
+             env(safe-area-inset-left, 0px);
+    background:
+        radial-gradient(
+            circle at center,
+            #0a0508 0%,
+            #050205 70%
+        );
+}
+
+@media (orientation: portrait) and (pointer: coarse) {
+    #rotateDeviceOverlay {
+        display: flex;
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+        color: #ffffcc;
+        font-family: "Courier New", monospace;
+        letter-spacing: 4px;
+        text-align: center;
+    }
+}
+
+.rotateContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    max-width: 320px;
+}
+
+.rotateEyebrow {
+    font-size: 11px;
+    letter-spacing: 5px;
+    color: #55565a;
+}
+
+.tayatnaPresence {
+    width: clamp(80px, 22vh, 140px);
+    height: clamp(80px, 22vh, 140px);
+}
+
+.tayatnaSvg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.tayatnaTendrils line {
+    stroke: #6b0000;
+    stroke-width: 1;
+    opacity: 0.5;
+    animation: tayatnaSway 9s ease-in-out infinite;
+}
+
+.tayatnaBody {
+    fill: #140508;
+    stroke: #a80000;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 8px rgba(168, 0, 0, 0.4));
+    animation: tayatnaBreathe 6s ease-in-out infinite;
+    transform-origin: center;
+}
+
+.tayatnaVoid {
+    fill: #000000;
+}
+
+.tayatnaEye {
+    fill: #8b0000;
+    animation: tayatnaBlink 7s ease-in-out infinite;
+    transform-origin: center;
+}
+
+@keyframes tayatnaBreathe {
+    0%, 100% {
+        transform: scale(1);
+        stroke-opacity: 0.75;
+    }
+
+    50% {
+        transform: scale(1.035);
+        stroke-opacity: 1;
+    }
+}
+
+@keyframes tayatnaSway {
+    0%, 100% {
+        opacity: 0.35;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+@keyframes tayatnaBlink {
+    0%, 92%, 100% {
+        transform: scaleY(1);
+    }
+
+    96% {
+        transform: scaleY(0.15);
+    }
+}
+
+.rotateConcept {
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: #8b0000;
+    text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
+}
+
+.rotateInstruction {
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #999999;
+}
+
+/* =========================================================
+   RESPONSIVE — WIDTH-BASED (unchanged behavior)
+========================================================= */
 
 @media (max-width: 900px) {
 
@@ -823,222 +1124,9 @@ button {
         font-size: 9px;
     }
 }
-/* =========================================================
-   VICTORY / CREDITS
-========================================================= */
-
-.victoryPanel {
-    border-color: #8b0000;
-    box-shadow:
-        0 0 60px rgba(139, 0, 0, 0.35),
-        inset 0 0 35px rgba(139, 0, 0, 0.12);
-}
-
-.victoryPanel .overlayHeader {
-    color: #ff3030;
-    text-shadow: 0 0 12px rgba(139, 0, 0, 0.6);
-}
-
-.victoryLine {
-    margin-top: 20px;
-    color: #cccccc;
-    font-size: 13px;
-    line-height: 1.7;
-    font-style: italic;
-}
-
-.creditsPanel {
-    text-align: center;
-    padding: 50px 40px;
-    border-color: #8b0000;
-}
-
-.creditsList p {
-    color: #999999;
-    font-size: 13px;
-    letter-spacing: 3px;
-    line-height: 2.4;
-}
-
-.creditsRole {
-    color: #444444;
-    font-size: 9px;
-    letter-spacing: 3px;
-}
-
-.creditsName {
-    color: #cccccc;
-    font-size: 13px;
-    letter-spacing: 2px;
-    margin-top: 2px;
-}
-
-.creditsSpaced {
-    margin-top: 10px;
-}
-
-.creditsFinal {
-    margin-top: 25px;
-    color: #ff3030;
-    font-size: 16px;
-    letter-spacing: 5px;
-    text-shadow: 0 0 10px rgba(139, 0, 0, 0.6);
-}
-
-.creditsStudio {
-    margin-top: 35px;
-    color: #444444;
-    font-size: 10px;
-    letter-spacing: 4px;
-}
-
-.creditsPanel .menuButton {
-    margin-top: 40px;
-}
-/* Fix real de escalado: ancho y alto ya no se limitan por
-   separado (eso podía deformar el canvas) — aspect-ratio
-   los mantiene coordinados en cualquier pantalla. */
-#gameWrapper {
-    aspect-ratio: 1200 / 720;
-    width: min(1200px, 100vw);
-    height: auto;
-    max-height: 100vh;
-    touch-action: none;
-}
-
-#gameCanvas {
-    touch-action: none;
-}
-
-/* Ocultas en PC por defecto; el propio HTML/body decide
-   cuándo mostrarlas via data-input-mode, sin tocar JS de
-   gameplay para nada relacionado con visibilidad. */
-.mobileOnly {
-    display: none;
-}
-
-body[data-input-mode="mobile"] .mobileOnly {
-    display: block;
-}
-
-.touchPad {
-    position: absolute;
-    bottom: calc(90px + env(safe-area-inset-bottom, 0px));
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,204,0.25);
-    background: rgba(4,4,12,0.55);
-    touch-action: none;
-    z-index: 50;
-}
-
-#touchJoystickBase {
-    left: calc(24px + env(safe-area-inset-left, 0px));
-}
-
-#touchAimBase {
-    right: calc(24px + env(safe-area-inset-right, 0px));
-}
-
-.touchPadKnob {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 44px;
-    height: 44px;
-    margin: -22px 0 0 -22px;
-    border-radius: 50%;
-    background: rgba(255,255,204,0.18);
-    border: 1px solid rgba(255,255,204,0.4);
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-}
-
-.touchAimKnob {
-    background: rgba(139,0,0,0.35);
-    border-color: rgba(139,0,0,0.6);
-}
-
-/* Ability cards: en mobile, target táctil más cómodo. */
-body[data-input-mode="mobile"] .abilityCard.touchTappable {
-    min-width: 54px;
-    min-height: 54px;
-    touch-action: none;
-}
-
-body[data-input-mode="mobile"] #bottomHUD {
-    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-}
-
-body[data-input-mode="mobile"] .pauseButton {
-    min-width: 44px;
-    min-height: 44px;
-}
-
-/* Rotación — pura CSS, sin JS */
-#rotateDeviceOverlay {
-    display: none;
-}
-
-@media (orientation: portrait) and (pointer: coarse) {
-
-    #rotateDeviceOverlay {
-        display: flex;
-        position: fixed;
-        inset: 0;
-        z-index: 999;
-        align-items: center;
-        justify-content: center;
-        background: #050509;
-        color: #ffffcc;
-        font-family: "Courier New", monospace;
-        letter-spacing: 4px;
-        text-align: center;
-    }
-}
-/* =========================================================
-   MOBILE FIX — REAL VIEWPORT HEIGHT
-
-   100vh on mobile browsers is computed against the LARGEST
-   possible viewport (as if the address bar were hidden), not
-   what is actually visible right now. That mismatch is why
-   the game only fit on screen at reduced browser zoom — the
-   wrapper was rendering taller than the real visible area.
-   100dvh reflects the actual current viewport and updates
-   live as the browser chrome shows/hides. Layered as a
-   cascade so unsupported units are simply ignored by older
-   browsers instead of breaking anything.
-========================================================= */
-
-#gameWrapper {
-    max-height: 100vh;
-    max-height: 100svh;
-    max-height: 100dvh;
-}
 
 /* =========================================================
-   MOBILE FIX — ABILITY CARDS WERE INERT TO TOUCH
-
-   #hud has pointer-events:none by design (so the HUD never
-   blocks PC mouse aiming over the canvas). .pauseButton was
-   already given its own override; .abilityCard never was,
-   which is the entire reason taps never reached the JS
-   listeners already correctly attached in TouchControls.js.
-========================================================= */
-
-.abilityCard {
-    pointer-events: auto;
-}
-
-/* =========================================================
-   MOBILE FIX — HEIGHT-AWARE RESPONSIVE RULES
-
-   Every existing breakpoint in this file keys off max-width.
-   Mobile play here is landscape-only (see the rotate overlay
-   below), where width is rarely the constraint — height is.
-   These rules shrink the HUD specifically when vertical space
-   is tight, independent of how wide the screen is.
+   RESPONSIVE — HEIGHT-BASED (landscape mobile)
 ========================================================= */
 
 @media (orientation: landscape) and (max-height: 480px) {
@@ -1104,140 +1192,6 @@ body[data-input-mode="mobile"] .pauseButton {
     }
 }
 
-/* =========================================================
-   SAFE AREAS — completing top/left/right coverage
-
-   Bottom was already handled for #bottomHUD/.pauseButton;
-   this adds the remaining edges so nothing sits under a
-   notch or a rounded corner on either side.
-========================================================= */
-
-#topHUD {
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-left: env(safe-area-inset-left, 0px);
-    padding-right: env(safe-area-inset-right, 0px);
-}
-
-/* =========================================================
-   ORIENTATION OVERLAY — REDESIGN
-
-   Show/hide logic is untouched (still the pure media query
-   at the bottom of this file) — only the content presentation
-   changes. Dark, minimal, quiet — Tayatna as a small watching
-   presence rather than a warning screen.
-========================================================= */
-
-#rotateDeviceOverlay {
-    padding: env(safe-area-inset-top, 0px)
-             env(safe-area-inset-right, 0px)
-             env(safe-area-inset-bottom, 0px)
-             env(safe-area-inset-left, 0px);
-    background:
-        radial-gradient(
-            circle at center,
-            #0a0508 0%,
-            #050205 70%
-        );
-}
-
-.rotateContent {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 18px;
-    max-width: 320px;
-}
-
-.rotateEyebrow {
-    font-size: 11px;
-    letter-spacing: 5px;
-    color: #55565a;
-}
-
-.tayatnaPresence {
-    width: clamp(80px, 22vh, 140px);
-    height: clamp(80px, 22vh, 140px);
-}
-
-.tayatnaSvg {
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-}
-
-.tayatnaTendrils line {
-    stroke: #6b0000;
-    stroke-width: 1;
-    opacity: 0.5;
-    animation: tayatnaSway 9s ease-in-out infinite;
-}
-
-.tayatnaBody {
-    fill: #0c0507;
-    stroke: #8b0000;
-    stroke-width: 1.5;
-    animation: tayatnaBreathe 6s ease-in-out infinite;
-    transform-origin: center;
-}
-
-.tayatnaVoid {
-    fill: #000000;
-}
-
-.tayatnaEye {
-    fill: #8b0000;
-    animation: tayatnaBlink 7s ease-in-out infinite;
-    transform-origin: center;
-}
-
-@keyframes tayatnaBreathe {
-
-    0%, 100% {
-        transform: scale(1);
-        stroke-opacity: 0.75;
-    }
-
-    50% {
-        transform: scale(1.035);
-        stroke-opacity: 1;
-    }
-}
-
-@keyframes tayatnaSway {
-
-    0%, 100% {
-        opacity: 0.35;
-    }
-
-    50% {
-        opacity: 0.6;
-    }
-}
-
-@keyframes tayatnaBlink {
-
-    0%, 92%, 100% {
-        transform: scaleY(1);
-    }
-
-    96% {
-        transform: scaleY(0.15);
-    }
-}
-
-.rotateConcept {
-    font-size: 12px;
-    letter-spacing: 4px;
-    color: #8b0000;
-    text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
-}
-
-.rotateInstruction {
-    font-size: 13px;
-    letter-spacing: 1px;
-    color: #999999;
-}
-
 @media (max-height: 340px) {
 
     .rotateContent {
@@ -1254,6 +1208,10 @@ body[data-input-mode="mobile"] .pauseButton {
         font-size: 10px;
     }
 }
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
 
