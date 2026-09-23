@@ -391,8 +391,12 @@ class TouchControls {
 
     _wireAbilityCards() {
 
+        /* THE EYE has no dedicated card/button on purpose — the
+           aim pad already fires it (mouse.down while dragging),
+           mirroring how holding left-click fires it on PC. A
+           separate tap target would be pure redundancy. */
+
         const bindings = [
-            { cooldownId: "cooldownEye", key: null, isEye: true },
             { cooldownId: "cooldownQ", key: "q" },
             { cooldownId: "cooldownC", key: "c" },
             { cooldownId: "cooldownE", key: "e" },
@@ -425,31 +429,14 @@ class TouchControls {
 
                     event.preventDefault();
 
-                    if (binding.isEye) {
-
-                        this.game.input.mouse.down = true;
-                    }
-                    else {
-
-                        this.game.input.keys[binding.key] = true;
-                    }
+                    this.game.input.keys[binding.key] = true;
                 },
                 { passive: false }
             );
 
             const release = () => {
 
-                if (binding.isEye) {
-
-                    if (!this.aimActive) {
-
-                        this.game.input.mouse.down = false;
-                    }
-                }
-                else {
-
-                    this.game.input.keys[binding.key] = false;
-                }
+                this.game.input.keys[binding.key] = false;
             };
 
             card.addEventListener("pointerup", release);

@@ -1,0 +1,266 @@
+/* =========================================================
+   MOBILE FIX — REAL VIEWPORT HEIGHT
+
+   100vh on mobile browsers is computed against the LARGEST
+   possible viewport (as if the address bar were hidden), not
+   what is actually visible right now. That mismatch is why
+   the game only fit on screen at reduced browser zoom — the
+   wrapper was rendering taller than the real visible area.
+   100dvh reflects the actual current viewport and updates
+   live as the browser chrome shows/hides. Layered as a
+   cascade so unsupported units are simply ignored by older
+   browsers instead of breaking anything.
+========================================================= */
+
+#gameWrapper {
+    max-height: 100vh;
+    max-height: 100svh;
+    max-height: 100dvh;
+}
+
+/* =========================================================
+   MOBILE FIX — ABILITY CARDS WERE INERT TO TOUCH
+
+   #hud has pointer-events:none by design (so the HUD never
+   blocks PC mouse aiming over the canvas). .pauseButton was
+   already given its own override; .abilityCard never was,
+   which is the entire reason taps never reached the JS
+   listeners already correctly attached in TouchControls.js.
+========================================================= */
+
+.abilityCard {
+    pointer-events: auto;
+}
+
+/* =========================================================
+   MOBILE FIX — HEIGHT-AWARE RESPONSIVE RULES
+
+   Every existing breakpoint in this file keys off max-width.
+   Mobile play here is landscape-only (see the rotate overlay
+   below), where width is rarely the constraint — height is.
+   These rules shrink the HUD specifically when vertical space
+   is tight, independent of how wide the screen is.
+========================================================= */
+
+@media (orientation: landscape) and (max-height: 480px) {
+
+    #topHUD {
+        top: calc(6px + env(safe-area-inset-top, 0px));
+        gap: 6px;
+    }
+
+    .resourceBlock {
+        width: 100px;
+    }
+
+    .counter {
+        min-width: 46px;
+    }
+
+    .waveCounter {
+        width: 80px;
+    }
+
+    #bottomHUD {
+        bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+        gap: 5px;
+    }
+
+    .abilityCard {
+        width: 56px;
+        height: 42px;
+        padding: 4px;
+    }
+
+    .abilityKey {
+        font-size: 10px;
+    }
+
+    .abilityName {
+        font-size: 6px;
+    }
+
+    #controlsText {
+        display: none;
+    }
+}
+
+@media (orientation: landscape) and (max-height: 380px) {
+
+    .resourceBlock {
+        width: 78px;
+    }
+
+    .waveCounter {
+        display: none;
+    }
+
+    .abilityCard {
+        width: 46px;
+        height: 38px;
+    }
+
+    .abilityName {
+        display: none;
+    }
+}
+
+/* =========================================================
+   SAFE AREAS — completing top/left/right coverage
+
+   Bottom was already handled for #bottomHUD/.pauseButton;
+   this adds the remaining edges so nothing sits under a
+   notch or a rounded corner on either side.
+========================================================= */
+
+#topHUD {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* =========================================================
+   ORIENTATION OVERLAY — REDESIGN
+
+   Show/hide logic is untouched (still the pure media query
+   at the bottom of this file) — only the content presentation
+   changes. Dark, minimal, quiet — Tayatna as a small watching
+   presence rather than a warning screen.
+========================================================= */
+
+#rotateDeviceOverlay {
+    padding: env(safe-area-inset-top, 0px)
+             env(safe-area-inset-right, 0px)
+             env(safe-area-inset-bottom, 0px)
+             env(safe-area-inset-left, 0px);
+    background:
+        radial-gradient(
+            circle at center,
+            #0a0508 0%,
+            #050205 70%
+        );
+}
+
+.rotateContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    max-width: 320px;
+}
+
+.rotateEyebrow {
+    font-size: 11px;
+    letter-spacing: 5px;
+    color: #55565a;
+}
+
+.tayatnaPresence {
+    width: clamp(80px, 22vh, 140px);
+    height: clamp(80px, 22vh, 140px);
+}
+
+.tayatnaSvg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.tayatnaTendrils line {
+    stroke: #6b0000;
+    stroke-width: 1;
+    opacity: 0.5;
+    animation: tayatnaSway 9s ease-in-out infinite;
+}
+
+.tayatnaBody {
+    fill: #0c0507;
+    stroke: #8b0000;
+    stroke-width: 1.5;
+    animation: tayatnaBreathe 6s ease-in-out infinite;
+    transform-origin: center;
+}
+
+.tayatnaVoid {
+    fill: #000000;
+}
+
+.tayatnaEye {
+    fill: #8b0000;
+    animation: tayatnaBlink 7s ease-in-out infinite;
+    transform-origin: center;
+}
+
+@keyframes tayatnaBreathe {
+
+    0%, 100% {
+        transform: scale(1);
+        stroke-opacity: 0.75;
+    }
+
+    50% {
+        transform: scale(1.035);
+        stroke-opacity: 1;
+    }
+}
+
+@keyframes tayatnaSway {
+
+    0%, 100% {
+        opacity: 0.35;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+@keyframes tayatnaBlink {
+
+    0%, 92%, 100% {
+        transform: scaleY(1);
+    }
+
+    96% {
+        transform: scaleY(0.15);
+    }
+}
+
+.rotateConcept {
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: #8b0000;
+    text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
+}
+
+.rotateInstruction {
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #999999;
+}
+
+@media (max-height: 340px) {
+
+    .rotateContent {
+        gap: 10px;
+    }
+
+    .tayatnaPresence {
+        width: clamp(56px, 16vh, 90px);
+        height: clamp(56px, 16vh, 90px);
+    }
+
+    .rotateEyebrow {
+        letter-spacing: 3px;
+        font-size: 10px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .tayatnaBody,
+    .tayatnaEye,
+    .tayatnaTendrils line {
+        animation: none;
+    }
+}
