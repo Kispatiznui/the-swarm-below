@@ -8174,9 +8174,16 @@ class Game {
 
         /* ABILITIES */
 
+        /* THE EYE intentionally has no card/cooldown bar in the
+           HUD — its 160ms cooldown with no energy cost means the
+           bar would cycle full→empty roughly every 160ms while
+           held, which is just visual noise, not information.
+           fireEye() and the mouse.down polling that drives it in
+           DefenseSystem are completely untouched — this removes
+           only the display, never the mechanic. */
+
         const cooldowns = {
 
-            cooldownEye: "eye",
             cooldownQ: "q",
             cooldownC: "c",
             cooldownE: "e",
